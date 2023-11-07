@@ -1,14 +1,12 @@
 package entidad;
 
-import java.util.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 
 
 
 public class Cliente {
-    private int idCliente; // Clave primaria (PK)
+    private int idCliente; // Clave prAimaria (PK)
     private String usuario;
     private String contrasena;
     private int activo;

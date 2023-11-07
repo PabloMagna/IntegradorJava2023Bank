@@ -11,8 +11,8 @@ public interface IClienteDao {
 	public Cliente ObtenerPorIdCliente(int idCliente);
 	public int ModificarCliente(Cliente cliente);
 	public int EliminarCliente(int idCliente);
-	public int DniUnico(int dni) ;
-	public int CuilUnico(String cuil);
+	public int DniUnico(int dni, int idCliente) ;
+	public int CuilUnico(String cuil, int idCliente);
 	public int UsuarioUnico(String usuario);
-	public int CorreoUnico(String correo);
+	public int CorreoUnico(String correo, int idCliente);
 }

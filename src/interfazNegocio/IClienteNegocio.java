@@ -11,8 +11,8 @@ public interface IClienteNegocio {
 	public Cliente ObtenerPorIdCliente(int idCliente);
 	public boolean ModificarCliente(Cliente cliente);
 	public boolean EliminarCliente(int idCliente);
-	public boolean DniUnico(int dni);
-	public boolean CuilUnico(String cuil);
+	public boolean DniUnico(int dni,int idCliente);
+	public boolean CuilUnico(String cuil,int idCliente);
 	public boolean UsuarioUnico(String usuario);
-	public boolean CorreoUnico(String correo);
+	public boolean CorreoUnico(String correo,int idCliente);
 }

@@ -43,7 +43,9 @@
 
 
 <%
-	Cliente clienteModificar = (Cliente) request.getAttribute("clienteModificar");
+	HttpSession session2 = request.getSession();
+	Cliente clienteModificar = (Cliente) session2.getAttribute("clienteDatos");
+
 	ArrayList<Provincia> provincias = (ArrayList<Provincia>) request.getAttribute("provincias");
 	ArrayList<Localidad> localidades = (ArrayList<Localidad>) request.getAttribute("localidades");
 	ArrayList<Telefono> listaTelefonos = (ArrayList<Telefono>) request.getAttribute("telefonos");

@@ -74,8 +74,8 @@ public class ClienteNegocio implements IClienteNegocio {
 	
 	//devuelven true si es unico elq ue se le pasa y puede ser agregado
 	@Override
-    public boolean CuilUnico(String cuil) {
-        return dao.CuilUnico(cuil) == 0 ? false : true;
+    public boolean CuilUnico(String cuil,int idCliente) {
+        return dao.CuilUnico(cuil,idCliente) == 0 ? false : true;
     }
 
     @Override
@@ -84,13 +84,13 @@ public class ClienteNegocio implements IClienteNegocio {
     }
 
     @Override
-    public boolean CorreoUnico(String correo) {
-        return dao.CorreoUnico(correo) == 0 ? false : true;
+    public boolean CorreoUnico(String correo,int idCliente) {
+        return dao.CorreoUnico(correo,idCliente) == 0 ? false : true;
     }
 
 	@Override
-	public boolean DniUnico(int dni) {
-		return dao.DniUnico(dni) == 0? false:true;
+	public boolean DniUnico(int dni,int idCliente) {
+		return dao.DniUnico(dni,idCliente) == 0? false:true;
 	}
 	
 }

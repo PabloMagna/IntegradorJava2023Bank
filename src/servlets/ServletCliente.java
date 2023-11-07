@@ -38,6 +38,8 @@ public class ServletCliente extends HttpServlet {
 		ClienteNegocio clienteNegocio = new ClienteNegocio();
 		// ALTA CLIENTE
 		if (request.getParameter("alta") != null) {
+			HttpSession session = request.getSession();
+			session.removeAttribute("clienteDatos");
 			CargarDescolgables(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
 			dispatcher.forward(request, response);
@@ -109,18 +111,18 @@ public class ServletCliente extends HttpServlet {
 		if (request.getParameter("ModifId") != null) {
 			int modifId = Integer.parseInt(request.getParameter("ModifId"));
 			clienteNegocio = new ClienteNegocio();
-			Cliente cliente = clienteNegocio.ObtenerPorIdCliente(modifId);
 			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(modifId);
 			request.setAttribute("telefonos", telefonos);
 
 			CargarDescolgables(request, response);
 
-			Cliente clienteModificar = clienteNegocio.ObtenerPorIdCliente(modifId);
+			Cliente cliente = clienteNegocio.ObtenerPorIdCliente(modifId);
 
-			if (clienteModificar != null) {
-				request.setAttribute("clienteModificar", clienteModificar);
+			if (cliente != null) {
+				HttpSession session = request.getSession();
+			    session.setAttribute("clienteDatos", cliente);
 
-				LocalDate fechaNacimientoCliente = clienteModificar.getFechaNacimiento();
+				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
 				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 				request.setAttribute("fechaNacimiento", fechaNacimientoString);
 
@@ -156,17 +158,21 @@ public class ServletCliente extends HttpServlet {
 
 			response.sendRedirect("Inicio.jsp");
 		}
+		
+		
 		// ALTA CLIENTE
 		if (request.getParameter("btnGuardar") != null) {
 		
 			Cliente cliente = obtenerClienteDesdeRequest(request);
-			
-			if (!clienteNegocio.DniUnico(cliente.getDni())) {
+			HttpSession session = request.getSession();
+		    session.setAttribute("clienteDatos", cliente);
+					
+			if (!clienteNegocio.DniUnico(cliente.getDni(),0)) {
 				cliente.setIdCliente(0);
 				
 				request.setAttribute("advertencia", "DNI existente en registros!");
 				
-				request.setAttribute("clienteModificar", cliente);
+				session.setAttribute("clienteDatos", cliente);
 				
 				CargarDescolgables(request,response);
 
@@ -184,7 +190,7 @@ public class ServletCliente extends HttpServlet {
 				
 				request.setAttribute("advertencia", "Nombre de usuario en uso, elegí otro!");
 				
-				request.setAttribute("clienteModificar", cliente);
+				session.setAttribute("clienteDatos", cliente);
 				
 				CargarDescolgables(request,response);
 
@@ -196,13 +202,13 @@ public class ServletCliente extends HttpServlet {
 				dispatcher.forward(request, response);
 				return;
 			}
-			if (!clienteNegocio.CuilUnico(cliente.getCuil())) {
+			if (!clienteNegocio.CuilUnico(cliente.getCuil(),0)) {
 				cliente.setIdCliente(0);
 				cliente.setCuil("");
 				
 				request.setAttribute("advertencia", "Cuil existente en registros!");
 				
-				request.setAttribute("clienteModificar", cliente);
+			    session.setAttribute("clienteDatos", cliente);
 				
 				CargarDescolgables(request,response);
 
@@ -214,13 +220,13 @@ public class ServletCliente extends HttpServlet {
 				dispatcher.forward(request, response);
 				return;
 			}
-			if (!clienteNegocio.CorreoUnico(cliente.getCorreo())) {
+			if (!clienteNegocio.CorreoUnico(cliente.getCorreo(),0)) {
 				cliente.setIdCliente(0);
 				cliente.setCorreo("");
 				
 				request.setAttribute("advertencia", "Correo existente, elegí otro!");
 				
-				request.setAttribute("clienteModificar", cliente);
+			    session.setAttribute("clienteDatos", cliente);
 				
 				CargarDescolgables(request,response);
 
@@ -242,25 +248,89 @@ public class ServletCliente extends HttpServlet {
 				TelefonoNegocio telefonoNegocio = new TelefonoNegocio();
 				String[] telefonos = request.getParameterValues("telefonos");
 				if (telefonos != null)
-					telefonoNegocio.AgregarTelefonos(cliente.getIdCliente(), telefonos);
+					telefonoNegocio.AgregarTelefonos(idCliente, telefonos);
 				else {
-					telefonoNegocio.AgregarTelefonos(cliente.getIdCliente(), null); // solo los borra
+					telefonoNegocio.AgregarTelefonos(idCliente, null); // solo los borra
 				}
 				CargarDescolgables(request, response);
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp?exito=true");
-				dispatcher.forward(request, response);
-			} else {
-				response.sendRedirect("Error.jsp");
+				// Redirige al ServletCliente con parámetros "Alta=1" y "exito=true"
+				response.sendRedirect(request.getContextPath() + "/ServletCliente?alta=1&exito=true");
 			}
 		}
+		
+		
+		
+		
 
 		// Modificacion de cliente
 		if (request.getParameter("btnModificar") != null) {
 			int clienteId = Integer.parseInt(request.getParameter("idCliente"));
-			Cliente clienteModificado = obtenerClienteDesdeRequest(request);
-			clienteModificado.setIdCliente(clienteId);
+			Cliente cliente = obtenerClienteDesdeRequest(request);
+			HttpSession session = request.getSession();
+		    session.setAttribute("clienteDatos", cliente);			
+			cliente.setIdCliente(clienteId);
+			
+			if (!clienteNegocio.DniUnico(cliente.getDni(),cliente.getIdCliente())) {				
+				request.setAttribute("advertencia", "DNI existente en registros!");
+				
+				session.setAttribute("clienteDatos", cliente);
+				
+				CargarDescolgables(request,response);
 
-			boolean exitoCliente = clienteNegocio.ModificarCliente(clienteModificado);
+				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+				request.setAttribute("fechaNacimiento", fechaNacimientoString);
+				
+				ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+				request.setAttribute("telefonos", telefonos);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp?ModifId="+cliente.getIdCliente());
+				dispatcher.forward(request, response);
+				return;
+			}
+			if (!clienteNegocio.CuilUnico(cliente.getCuil(),cliente.getIdCliente())) {
+				cliente.setCuil("");
+				
+				request.setAttribute("advertencia", "Cuil existente en registros!");
+				
+			    session.setAttribute("clienteDatos", cliente);
+				
+				CargarDescolgables(request,response);
+
+				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+				request.setAttribute("fechaNacimiento", fechaNacimientoString);
+				
+				ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+				request.setAttribute("telefonos", telefonos);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp?ModifId="+cliente.getIdCliente());
+				dispatcher.forward(request, response);
+				return;
+			}
+			if (!clienteNegocio.CorreoUnico(cliente.getCorreo(),cliente.getIdCliente())) {
+				cliente.setCorreo("");
+				
+				request.setAttribute("advertencia", "Correo existente, elegí otro!");
+				
+			    session.setAttribute("clienteDatos", cliente);
+				
+				CargarDescolgables(request,response);
+
+				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+				request.setAttribute("fechaNacimiento", fechaNacimientoString);
+				
+				ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+				request.setAttribute("telefonos", telefonos);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp?ModifId="+cliente.getIdCliente());
+				dispatcher.forward(request, response);
+				return;
+			}
+			
+
+			boolean exitoCliente = clienteNegocio.ModificarCliente(cliente);
 
 			if (exitoCliente) {
 				TelefonoNegocio telefonoNegocio = new TelefonoNegocio();
@@ -315,7 +385,8 @@ public class ServletCliente extends HttpServlet {
 
 	private Cliente obtenerClienteDesdeRequest(HttpServletRequest request) {
 		Cliente cliente = new Cliente();
-
+		
+		String idClienteStr = request.getParameter("idCliente");
 		String usuario = request.getParameter("usuario");
 		String contrasena = request.getParameter("contrasena");
 		String dniStr = request.getParameter("dni");
@@ -331,6 +402,7 @@ public class ServletCliente extends HttpServlet {
 		String correo = request.getParameter("correo");
 
 		try {
+			int idCliente = Integer.parseInt(idClienteStr);
 			int dni = Integer.parseInt(dniStr);
 			int sexo = Integer.parseInt(sexoStr);
 			int localidadId = Integer.parseInt(localidadIdStr);
@@ -345,7 +417,8 @@ public class ServletCliente extends HttpServlet {
 
 			Provincia provincia = new Provincia();
 			provincia.setId(provinciaId);
-
+			
+			cliente.setIdCliente(idCliente);
 			cliente.setUsuario(usuario);
 			cliente.setContrasena(contrasena);
 			cliente.setDni(dni);
@@ -371,5 +444,69 @@ public class ServletCliente extends HttpServlet {
 
 		return cliente;
 	}
+	
+	/*private Cliente ValidarDniCuilUsuarioCorreoUnico(Cliente cliente, HttpServletRequest request, HttpServletResponse response) {
+		ClienteNegocio clienteNegocio = new ClienteNegocio();
+		
+		if (!clienteNegocio.DniUnico(cliente.getDni(),cliente.getIdCliente())) {				
+			request.setAttribute("advertencia", "DNI existente en registros!");
+			
+			HttpSession session2 = request.getSession();
+			session2.setAttribute("clienteDatos", cliente);
+			
+			CargarDescolgables(request,response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+			
+			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+			request.setAttribute("telefonos", telefonos);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp?ModifId="+cliente.getIdCliente());
+			dispatcher.forward(request, response);
+			return cliente;
+		}
+		if (!clienteNegocio.CuilUnico(cliente.getCuil(),cliente.getIdCliente())) {
+			cliente.setCuil("");
+			
+			request.setAttribute("advertencia", "Cuil existente en registros!");
+			
+		    session.setAttribute("clienteDatos", cliente);
+			
+			CargarDescolgables(request,response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+			
+			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+			request.setAttribute("telefonos", telefonos);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp?ModifId="+cliente.getIdCliente());
+			dispatcher.forward(request, response);
+			return;
+		}
+		if (!clienteNegocio.CorreoUnico(cliente.getCorreo(),cliente.getIdCliente())) {
+			cliente.setCorreo("");
+			
+			request.setAttribute("advertencia", "Correo existente, elegí otro!");
+			
+		    session.setAttribute("clienteDatos", cliente);
+			
+			CargarDescolgables(request,response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+			
+			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+			request.setAttribute("telefonos", telefonos);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp?ModifId="+cliente.getIdCliente());
+			dispatcher.forward(request, response);
+			return;
+		}
+	}*/
 
 }

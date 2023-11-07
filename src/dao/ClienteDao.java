@@ -254,43 +254,6 @@ public class ClienteDao implements IClienteDao {
         return null;
     }
 
-    public int DniUnico(int dni) {
-        // Implementación del método DniUnico
-        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE dni = ? AND activo = 1";
-        try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
-            statement.setInt(1, dni);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    int count = resultSet.getInt("count");
-                    return count > 0 ? 0 : 1; // Devuelve 0 si el DNI existe y está activo, 1 si es único o inactivo.
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al verificar si el DNI es único y activo: " + e.getMessage());
-        }
-
-        return 0; // En caso de error, devolvemos 0 por defecto.
-    }
-
-    @Override
-    public int CuilUnico(String cuil) {
-        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE cuil = ? AND activo = 1";
-        try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
-            statement.setString(1, cuil);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    int count = resultSet.getInt("count");
-                    return count > 0 ? 0 : 1; // Devuelve 0 si el CUIL existe y está activo, 1 si es único o inactivo.
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al verificar si el CUIL es único y activo: " + e.getMessage());
-        }
-
-        return 0;
-    }
 
     @Override
     public int UsuarioUnico(String usuario) {
@@ -310,12 +273,50 @@ public class ClienteDao implements IClienteDao {
 
         return 0;
     }
-
     @Override
-    public int CorreoUnico(String correo) {
-        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE correo = ? AND activo = 1";
+    public int DniUnico(int dni, int idCliente) {
+        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE dni = ? AND activo = 1 AND idCliente <> ?";
+        try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
+            statement.setInt(1, dni);
+            statement.setInt(2, idCliente);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt("count");
+                    return count > 0 ? 0 : 1; // Devuelve 0 si el DNI existe y está activo, 1 si es único o inactivo.
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar si el DNI es único y activo: " + e.getMessage());
+        }
+
+        return 0; // En caso de error, devolvemos 0 por defecto.
+    }
+    @Override
+    public int CuilUnico(String cuil, int idCliente) {
+        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE cuil = ? AND activo = 1 AND idCliente <> ?";
+        try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
+            statement.setString(1, cuil);
+            statement.setInt(2, idCliente);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt("count");
+                    return count > 0 ? 0 : 1; // Devuelve 0 si el CUIL existe y está activo, 1 si es único o inactivo.
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar si el CUIL es único y activo: " + e.getMessage());
+        }
+
+        return 0;
+    }
+    @Override
+    public int CorreoUnico(String correo, int idCliente) {
+        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE correo = ? AND activo = 1 AND idCliente <> ?";
         try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
             statement.setString(1, correo);
+            statement.setInt(2, idCliente);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -329,5 +330,6 @@ public class ClienteDao implements IClienteDao {
 
         return 0;
     }
+
 }
 
