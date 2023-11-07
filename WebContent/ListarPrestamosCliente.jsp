@@ -48,13 +48,13 @@
 					if (listaCuotas != null) {
 						Set<Integer> idPrestamosUnicos = new HashSet<>();
 						for (Cuota cuota : listaCuotas) {
-							idPrestamosUnicos.add(cuota.getIdPrestamo());
+							idPrestamosUnicos.add(cuota.getPrestamo().getIdPrestamo());
 						}
 
 						for (Integer idPrestamo : idPrestamosUnicos) {
 							ArrayList<Cuota> cuotasDelPrestamo = new ArrayList<Cuota>();
 							for (Cuota cuota : listaCuotas) {
-								if (cuota.getIdPrestamo() == idPrestamo) {
+								if (cuota.getPrestamo().getIdPrestamo() == idPrestamo) {
 									cuotasDelPrestamo.add(cuota);
 								}
 							}
@@ -66,7 +66,7 @@
 							<%
 								for (Cuota cuota : cuotasDelPrestamo) {
 							%>
-							<option value="<%=cuota.getNumeroCuota()%>"><%=cuota.getNumeroCuota()%></option>
+							<option value="<%=cuota.getIdCuota()%>"><%=cuota.getNumeroCuota()%></option>
 							<%
 								}
 							%>

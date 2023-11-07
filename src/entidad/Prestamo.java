@@ -92,5 +92,8 @@ public class Prestamo {
 		else
 			this.estado = Estado.RECHAZADO;
 	}
+	public Estado getEstado() {
+		return this.estado;
+	}
 	
 }

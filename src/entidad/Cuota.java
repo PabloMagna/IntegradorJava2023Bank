@@ -3,6 +3,7 @@ package entidad;
 import java.time.LocalDate;
 
 public class Cuota {
+	private int idCuota;
 	private int numeroCuota;
 	private Prestamo prestamo;
 	private double importe;
@@ -25,7 +26,14 @@ public class Cuota {
 		this.fechaPago = fechaPago;
 		this.estado = estado;
 	}
-
+	
+	public int getIdCuota() {
+		return this.idCuota;
+	}
+	public void setIdCuota(int idCuota) {
+		this.idCuota = idCuota;
+	}
+	
 	public int getNumeroCuota() {
 		return numeroCuota;
 	}
@@ -65,5 +73,7 @@ public class Cuota {
 	public void setEstado(Estado estado) {
 		this.estado = estado;
 	}
+	
+	
 
 }

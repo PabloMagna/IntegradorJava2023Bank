@@ -51,14 +51,7 @@ public class ServletPrestamo extends HttpServlet {
 
 			response.sendRedirect("PedirPrestamo.jsp");
 		}
-		if (request.getParameter("lista") != null) {
-			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
-			ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes();
-
-			request.setAttribute("listaPrestamo", listaPrestamos);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
-			dispatcher.forward(request, response);
-		}
+		
 		if (request.getParameter("listaPagar") != null) {
 			HttpSession session = request.getSession();
 			Cliente cliente = (Cliente) session.getAttribute("cliente");
@@ -77,6 +70,18 @@ public class ServletPrestamo extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
 			dispatcher.forward(request, response);
 		}
+		
+		
+		// ADMIN ----------------------------------------
+		if (request.getParameter("lista") != null) {
+			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
+			ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes();
+
+			request.setAttribute("listaPrestamo", listaPrestamos);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
+			dispatcher.forward(request, response);
+		}
+		
 
 	}
 
@@ -85,6 +90,7 @@ public class ServletPrestamo extends HttpServlet {
 		if (request.getParameter("btnPedirPrestamo") != null) {
 			HttpSession session = request.getSession();
 			Cuenta cuenta = (Cuenta) session.getAttribute("cuentaPrestamo");
+			
 			Cliente cliente = (Cliente) session.getAttribute("cliente");
 
 			Prestamo prestamo = new Prestamo();
@@ -104,9 +110,10 @@ public class ServletPrestamo extends HttpServlet {
 			boolean exito = prestamoNegocio.PedirPrestamo(prestamo);
 
 			if (exito) {
-				session.setAttribute("cuentaPrestamo", null);
-				response.sendRedirect("ListadoCuentasDeCliente.jsp");
+			    session.setAttribute("cuentaPrestamo", null);
+			    response.sendRedirect(request.getContextPath() + "/ServletCuenta?listaPorId=1"); 
 			}
+
 		}
 		if (request.getParameter("btnAprobar") != null) {
 			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
@@ -148,7 +155,7 @@ public class ServletPrestamo extends HttpServlet {
 		}
 		if (request.getParameter("btnPagar") != null) {
 			int idPrestamo = Integer.parseInt(request.getParameter("btnPagar"));
-			int numeroCuota = Integer.parseInt(request.getParameter("cuota"));
+			int idCuota = Integer.parseInt(request.getParameter("cuota"));
 			double importe = Double.parseDouble(request.getParameter("importe"));
 			int numeroCuenta = Integer.parseInt(request.getParameter("cuenta"));
 
@@ -156,7 +163,7 @@ public class ServletPrestamo extends HttpServlet {
 
 			// Pasa a cuota paga
 			CuotaNegocio cuotaNegocio = new CuotaNegocio();
-			boolean exitoCuota = cuotaNegocio.PagarCuota(numeroCuota, idPrestamo);
+			boolean exitoCuota = cuotaNegocio.PagarCuota(idCuota);
 
 			// modifica el saldo
 			CuentaNegocio cuentaNegocio = new CuentaNegocio();

@@ -117,18 +117,14 @@ public class PrestamoDao implements IPrestamoDao {
     public ArrayList<Prestamo> ListarPendientes() {
         ArrayList<Prestamo> prestamosPendientes = new ArrayList<>();
         
-        String query = "SELECT cuota.*, prestamo.*, cuenta.*, cliente.*, " +
-                "tiposcuenta.descripcion AS tipoCuentaDescripcion, " +
-                "localidades.nombre AS localidadDescripcion, " +
-                "provincias.nombre AS provinciaDescripcion " +
-                "FROM cuota " +
-                "JOIN prestamo ON cuota.idPrestamo = prestamo.idPrestamo " +
-                "JOIN cuenta ON prestamo.numeroCuenta = cuenta.numero " +
-                "JOIN cliente ON cuenta.idCliente = cliente.idCliente " +
-                "JOIN tiposcuenta ON cuenta.idTipoCuenta = tiposcuenta.idTipoCuenta " +
-                "JOIN localidades ON cliente.idLocalidad = localidades.id " +
-                "JOIN provincias ON cliente.idProvincia = provincias.id " +
-                "WHERE cuota.nCuota = ? AND prestamo.idPrestamo = ?";
+        String query = "SELECT p.*, c.*, cl.*, tc.descripcion AS tipoCuentaDescripcion, l.nombre AS localidadDescripcion, pr.nombre AS provinciaDescripcion " +
+                "FROM prestamo p " +
+                "JOIN cuenta c ON p.numeroCuenta = c.numero " +
+                "JOIN cliente cl ON c.idCliente = cl.idCliente " +
+                "JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta " +
+                "JOIN provincias pr ON cl.idProvincia = pr.id " +
+                "JOIN localidades l ON cl.idLocalidad = l.id " +
+                "WHERE p.estado = 0";
 
 
         try (PreparedStatement statement = conexion.prepareStatement(query);

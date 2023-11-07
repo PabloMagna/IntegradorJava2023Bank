@@ -29,13 +29,14 @@ public class CuotaDao implements ICuotaDao {
 	    int idPrestamo = prestamo.getIdPrestamo();
 	    int cantidadCuotas = prestamo.getCuotas();
 	    double importePorMes = prestamo.getImportePorMes();
-	    
-	    String query = "INSERT INTO cuota (idPrestamo, importe, fechaPago, estado) VALUES (?, ?, NULL, 0)";
+
+	    String query = "INSERT INTO cuota (nCuota, idPrestamo, importe, fechaPago, estado) VALUES (?, ?, ?, NULL, 0)";
 
 	    try (PreparedStatement pstmt = conexion.prepareStatement(query)) {
 	        for (int nCuota = 1; nCuota <= cantidadCuotas; nCuota++) {
-	            pstmt.setInt(1, idPrestamo);
-	            pstmt.setDouble(2, importePorMes);
+	            pstmt.setInt(1, nCuota); // Agregar el número de cuota
+	            pstmt.setInt(2, idPrestamo);
+	            pstmt.setDouble(3, importePorMes);
 	            pstmt.addBatch(); // Agregar la sentencia a un lote para mejorar el rendimiento
 	        }
 
@@ -53,25 +54,25 @@ public class CuotaDao implements ICuotaDao {
 	    }
 	    return 0;
 	}
-	@Override
-	public int PagarCuota(int numeroCuota, int idPrestamo) {
-		String query = "UPDATE cuota SET fechaPago = CURRENT_DATE, estado = ? WHERE nCuota = ? AND idPrestamo = ?";
 
-		try (PreparedStatement pstmt = conexion.prepareStatement(query)) {
-			pstmt.setInt(1, 1); // 1 representa el estado PAGO en la base de datos
-			pstmt.setInt(2, numeroCuota);
-			pstmt.setInt(3, idPrestamo);
+	public int PagarCuota(int idCuota, int idPrestamo) {
+	    String query = "UPDATE cuota SET fechaPago = CURRENT_DATE, estado = ? WHERE idCuota = ? AND idPrestamo = ?";
 
-			return pstmt.executeUpdate();
-		} catch (SQLException e) {
+	    try (PreparedStatement pstmt = conexion.prepareStatement(query)) {
+	        pstmt.setInt(1, 1); // 1 representa el estado PAGO en la base de datos
+	        pstmt.setInt(2, idCuota);
+	        pstmt.setInt(3, idPrestamo);
 
-			e.printStackTrace();
-		}
-		return 0;
+	        return pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
 	}
 
+
 	@Override
-	public Cuota obtenerCuotaPorNumeroYID(int numeroCuota, int idPrestamo) {
+	public Cuota obtenerCuotaPorNumeroYID(int idCouta) {
 		String query = "SELECT cuota.*, prestamo.*, cuenta.*, cliente.*, tiposcuenta.*, localidades.*, provincias.* " +
 		            "FROM cuota " +
 		            "JOIN prestamo ON cuota.idPrestamo = prestamo.idPrestamo " +
@@ -80,11 +81,10 @@ public class CuotaDao implements ICuotaDao {
 		            "JOIN tiposcuenta ON cuenta.idTipoCuenta = tiposcuenta.idTipoCuenta " +
 		            "JOIN localidades ON cliente.idLocalidad = localidades.id " +
 		            "JOIN provincias ON cliente.idProvincia = provincias.id " +
-		            "WHERE cuota.nCuota = ? AND prestamo.idPrestamo = ?";
+		            "WHERE cuota.idCuota = ?";
 
 	    try (PreparedStatement pstmt = conexion.prepareStatement(query)) {
-	        pstmt.setInt(1, numeroCuota);
-	        pstmt.setInt(2, idPrestamo);
+	        pstmt.setInt(1, idCouta);
 
 	        try (ResultSet rs = pstmt.executeQuery()) {
 	            if (rs.next()) {
@@ -103,7 +103,7 @@ public class CuotaDao implements ICuotaDao {
 	                prestamo.setFechaPedido(rs.getDate("fechaPedido").toLocalDate());
 	                prestamo.setEstado((rs.getInt("prestamoEstado") == 1) ? Prestamo.Estado.APROBADO : Prestamo.Estado.PENDIENTE);
 
-
+	                cuota.setIdCuota(rs.getInt("idCuota"));
 	                cuota.setNumeroCuota(rs.getInt("nCuota"));
 	                cuota.setImporte(rs.getDouble("importe"));
 	                cuota.setFechaPago((rs.getDate("fechaPago") != null) ? rs.getDate("fechaPago").toLocalDate() : null);
@@ -118,13 +118,13 @@ public class CuotaDao implements ICuotaDao {
 	                cuenta.setFecha(rs.getDate("cuenta.fecha").toLocalDate());
 	                cuenta.setActivo(rs.getInt("cuenta.activo"));
 
-	                tipoCuenta.setIdTipoCuenta(rs.getInt("tiposcuenta.id"));
+	                tipoCuenta.setIdTipoCuenta(rs.getInt("idtipocuenta"));
 	                tipoCuenta.setDescripcion(rs.getString("tiposcuenta.descripcion"));
 	                cuenta.setTipoCuenta(tipoCuenta);
 
 	                cliente.setIdCliente(rs.getInt("cliente.idCliente"));
 	                cliente.setUsuario(rs.getString("cliente.usuario"));
-	                cliente.setContrasena(rs.getString("cliente.contrasena"));
+	                cliente.setContrasena(rs.getString("cliente.contraseña"));
 	                cliente.setActivo(rs.getInt("cliente.activo"));
 	                cliente.setFechaCreacion(rs.getDate("cliente.fechaCreacion").toLocalDate());
 	                cliente.setTipoCliente(Cliente.TipoCliente.values()[rs.getInt("cliente.idTipo")]);
@@ -140,11 +140,11 @@ public class CuotaDao implements ICuotaDao {
 
 	                localidad.setId(rs.getInt("localidades.id"));
 	                localidad.setIdProvincia(rs.getInt("localidades.idProvincia"));
-	                localidad.setNombre(rs.getString("localidades.descripcion"));
+	                localidad.setNombre(rs.getString("localidades.nombre"));
 	                cliente.setLocalidad(localidad);
 
 	                provincia.setId(rs.getInt("provincias.id"));
-	                provincia.setNombre(rs.getString("provincias.descripcion"));
+	                provincia.setNombre(rs.getString("provincias.nombre"));
 	                cliente.setProvincia(provincia);
 
 	                cuenta.setCliente(cliente);
@@ -203,20 +203,21 @@ public class CuotaDao implements ICuotaDao {
 	                prestamo.setFechaPedido(rs.getDate("fechaPedido").toLocalDate());
 
 	                cuota.setPrestamo(prestamo);
-
+	                
+	                cuota.setIdCuota(rs.getInt("idCuota"));
 	                cuenta.setNumero(rs.getInt("cuenta.numero"));
 	                cuenta.setCBU(rs.getString("cuenta.CBU"));
 	                cuenta.setSaldo(rs.getDouble("cuenta.saldo"));
 	                cuenta.setFecha(rs.getDate("cuenta.fecha").toLocalDate());
 	                cuenta.setActivo(rs.getInt("cuenta.activo"));
 
-	                tipoCuenta.setIdTipoCuenta(rs.getInt("tiposcuenta.id"));
+	                tipoCuenta.setIdTipoCuenta(rs.getInt("idtipocuenta"));
 	                tipoCuenta.setDescripcion(rs.getString("tiposcuenta.descripcion"));
 	                cuenta.setTipoCuenta(tipoCuenta);
 
 	                cliente.setIdCliente(rs.getInt("cliente.idCliente"));
 	                cliente.setUsuario(rs.getString("cliente.usuario"));
-	                cliente.setContrasena(rs.getString("cliente.contrasena"));
+	                cliente.setContrasena(rs.getString("cliente.contraseña"));
 	                cliente.setActivo(rs.getInt("cliente.activo"));
 	                cliente.setFechaCreacion(rs.getDate("cliente.fechaCreacion").toLocalDate());
 	                cliente.setTipoCliente(Cliente.TipoCliente.values()[rs.getInt("cliente.idTipo")]);
@@ -232,11 +233,11 @@ public class CuotaDao implements ICuotaDao {
 
 	                localidad.setId(rs.getInt("localidades.id"));
 	                localidad.setIdProvincia(rs.getInt("localidades.idProvincia"));
-	                localidad.setNombre(rs.getString("localidades.descripcion"));
+	                localidad.setNombre(rs.getString("localidades.nombre"));
 	                cliente.setLocalidad(localidad);
 
 	                provincia.setId(rs.getInt("provincias.id"));
-	                provincia.setNombre(rs.getString("provincias.descripcion"));
+	                provincia.setNombre(rs.getString("provincias.nombre"));
 	                cliente.setProvincia(provincia);
 
 	                cuenta.setCliente(cliente);
@@ -295,20 +296,21 @@ public class CuotaDao implements ICuotaDao {
 	                prestamo.setFechaPedido(rs.getDate("fechaPedido").toLocalDate());
 
 	                cuota.setPrestamo(prestamo);
-
+	                
+	                cuota.setIdCuota(rs.getInt("idCuota"));
 	                cuenta.setNumero(rs.getInt("cuenta.numero"));
 	                cuenta.setCBU(rs.getString("cuenta.CBU"));
 	                cuenta.setSaldo(rs.getDouble("cuenta.saldo"));
 	                cuenta.setFecha(rs.getDate("cuenta.fecha").toLocalDate());
 	                cuenta.setActivo(rs.getInt("cuenta.activo"));
 
-	                tipoCuenta.setIdTipoCuenta(rs.getInt("tiposcuenta.id"));
+	                tipoCuenta.setIdTipoCuenta(rs.getInt("idtipocuenta"));
 	                tipoCuenta.setDescripcion(rs.getString("tiposcuenta.descripcion"));
 	                cuenta.setTipoCuenta(tipoCuenta);
 
 	                cliente.setIdCliente(rs.getInt("cliente.idCliente"));
 	                cliente.setUsuario(rs.getString("cliente.usuario"));
-	                cliente.setContrasena(rs.getString("cliente.contrasena"));
+	                cliente.setContrasena(rs.getString("cliente.contraseña"));
 	                cliente.setActivo(rs.getInt("cliente.activo"));
 	                cliente.setFechaCreacion(rs.getDate("cliente.fechaCreacion").toLocalDate());
 	                cliente.setTipoCliente(Cliente.TipoCliente.values()[rs.getInt("cliente.idTipo")]);
@@ -324,11 +326,11 @@ public class CuotaDao implements ICuotaDao {
 
 	                localidad.setId(rs.getInt("localidades.id"));
 	                localidad.setIdProvincia(rs.getInt("localidades.idProvincia"));
-	                localidad.setNombre(rs.getString("localidades.descripcion"));
+	                localidad.setNombre(rs.getString("localidades.nombre"));
 	                cliente.setLocalidad(localidad);
 
 	                provincia.setId(rs.getInt("provincias.id"));
-	                provincia.setNombre(rs.getString("provincias.descripcion"));
+	                provincia.setNombre(rs.getString("provincias.nombre"));
 	                cliente.setProvincia(provincia);
 
 	                cuenta.setCliente(cliente);
@@ -343,6 +345,21 @@ public class CuotaDao implements ICuotaDao {
 	    }
 	    return cuotas;
 	}
+	@Override
+	public int PagarCuota(int idCuota) {
+	    String query = "UPDATE cuota SET fechaPago = CURRENT_DATE, estado = ? WHERE idCuota = ?";
+
+	    try (PreparedStatement pstmt = conexion.prepareStatement(query)) {
+	        pstmt.setInt(1, 1); // 1 representa el estado PAGO en la base de datos
+	        pstmt.setInt(2, idCuota);
+
+	        return pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
+	}
+
 
 
 }

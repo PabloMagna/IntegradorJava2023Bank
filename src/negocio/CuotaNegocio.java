@@ -7,22 +7,22 @@ import entidad.Cuota;
 import entidad.Prestamo;
 import interfazNegocio.ICuotaNegocio;
 
-public class CuotaNegocio implements ICuotaNegocio{
+public class CuotaNegocio implements ICuotaNegocio {
 	CuotaDao dao = new CuotaDao();
 
 	@Override
-	public boolean GenerarCuotas(Prestamo prestamo)  {
-		return dao.GenerarCuotas(prestamo) == 0?false:true;
+	public boolean GenerarCuotas(Prestamo prestamo) {
+		return dao.GenerarCuotas(prestamo) == 0 ? false : true;
 	}
 
 	@Override
-	public boolean PagarCuota(int numeroCuota, int idPrestamo) {
-		return dao.PagarCuota(numeroCuota, idPrestamo) == 0? false : true;
+	public boolean PagarCuota(int idCuota) {
+		return dao.PagarCuota(idCuota) == 0 ? false : true;
 	}
 
 	@Override
-	public Cuota obtenerCuotaPorNumeroYID(int numeroCuota, int idPrestamo) {
-		return dao.obtenerCuotaPorNumeroYID(numeroCuota, idPrestamo);
+	public Cuota obtenerCuotaPorNumeroYID(int numeroCuota) {
+		return dao.obtenerCuotaPorNumeroYID(numeroCuota);
 	}
 
 	@Override

@@ -55,8 +55,8 @@
 			%>
 			<tr>
 				<td><%=prestamo.getIdPrestamo()%></td>
-				<td><%=prestamo.getNumeroCuenta()%></td>
-				<td><%=prestamo.getIdCliente()%></td>
+				<td><%=prestamo.getCuenta().getNumero()%></td>
+				<td><%=prestamo.getCuenta().getCliente().getIdCliente()%></td>
 				<td><%=prestamo.getImportePedido()%></td>
 				<td><%=prestamo.getImportePorMes()%></td>
 				<td><%=prestamo.getCuotas()%></td>
