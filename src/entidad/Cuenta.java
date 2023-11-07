@@ -70,5 +70,10 @@ public class Cuenta {
 		this.tipoCuenta = tipoCuenta;
 	}
 
-    
+	@Override
+	public String toString() {
+		return "Cuenta [numero=" + numero + ", cliente=" + cliente + ", CBU=" + CBU + ", saldo=" + saldo + ", fecha="
+				+ fecha + ", activo=" + activo + ", tipoCuenta=" + tipoCuenta + "]";
+	}
+
 }
