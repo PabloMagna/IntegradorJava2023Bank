@@ -206,73 +206,85 @@ public class CuentaDao implements ICuentaDao {
 	}
 
 	@Override
-	public ArrayList<Cuenta> ListarPorIdCliente(int idCliente) {
-	    ArrayList<Cuenta> cuentas = new ArrayList<>();
+	public ArrayList<Cuenta> ListarPorIdCliente(int idCliente, String busqueda) {
+		ArrayList<Cuenta> cuentas = new ArrayList<>();
 
-	    String selectQuery = "SELECT c.*, tc.descripcion, cl.*, loc.id, loc.nombre AS localidad, prov.id, prov.nombre AS provincia " +
-	            "FROM cuenta c " +
-	            "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta " +
-	            "INNER JOIN cliente cl ON c.idCliente = cl.idCliente " +
-	            "INNER JOIN localidades loc ON cl.idLocalidad = loc.id " +
-	            "INNER JOIN provincias prov ON cl.idProvincia = prov.id " +
-	            "WHERE c.idCliente = ? AND c.activo = 1";
+		StringBuilder queryBuilder = new StringBuilder(
+				"SELECT c.*, tc.descripcion, cl.*, loc.id, loc.nombre AS localidad, prov.id, prov.nombre AS provincia "
+						+ "FROM cuenta c " + "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta "
+						+ "INNER JOIN cliente cl ON c.idCliente = cl.idCliente "
+						+ "INNER JOIN localidades loc ON cl.idLocalidad = loc.id "
+						+ "INNER JOIN provincias prov ON cl.idProvincia = prov.id "
+						+ "WHERE c.idCliente = ? AND c.activo = 1");
 
-	    try (PreparedStatement statement = conexion.prepareStatement(selectQuery)) {
-	        statement.setInt(1, idCliente);
+		if (busqueda != null && !busqueda.isEmpty()) {
+			// Si busqueda no es nulo ni vacío, agregamos las condiciones LIKE
+			queryBuilder.append(" AND (c.CBU LIKE ? OR c.numero = ? OR cl.idCliente = ? OR tc.descripcion LIKE ?)");
+		}
 
-	        try (ResultSet resultSet = statement.executeQuery()) {
-	            while (resultSet.next()) {
-	                Cuenta cuenta = new Cuenta();
-	                cuenta.setNumero(resultSet.getInt("numero"));
-	                cuenta.setCBU(resultSet.getString("CBU"));
-	                cuenta.setSaldo(resultSet.getDouble("saldo"));
-	                cuenta.setFecha(resultSet.getDate("fecha").toLocalDate());
-	                cuenta.setActivo(resultSet.getInt("activo"));
+		try (PreparedStatement statement = conexion.prepareStatement(queryBuilder.toString())) {
+			statement.setInt(1, idCliente);
+			if (busqueda != null && !busqueda.isEmpty()) {
+				// Si busqueda no es nulo ni vacío, establecemos los parámetros
+				statement.setString(2, "%" + busqueda + "%");
+				statement.setString(3, busqueda);
+				statement.setString(4, busqueda);
+				statement.setString(5, "%" + busqueda + "%");
+			}
+			
 
-	                TipoCuenta tipoCuenta = new TipoCuenta();
-	                tipoCuenta.setIdTipoCuenta(resultSet.getInt("idTipoCuenta"));
-	                tipoCuenta.setDescripcion(resultSet.getString("descripcion"));
-	                
-	                cuenta.setTipoCuenta(tipoCuenta);
+			try (ResultSet resultSet = statement.executeQuery()) {
+				while (resultSet.next()) {
+					Cuenta cuenta = new Cuenta();
+					cuenta.setNumero(resultSet.getInt("numero"));
+					cuenta.setCBU(resultSet.getString("CBU"));
+					cuenta.setSaldo(resultSet.getDouble("saldo"));
+					cuenta.setFecha(resultSet.getDate("fecha").toLocalDate());
+					cuenta.setActivo(resultSet.getInt("activo"));
 
-	                Cliente cliente = new Cliente();
-	                cliente.setIdCliente(resultSet.getInt("idCliente"));
-	                cliente.setUsuario(resultSet.getString("usuario"));
-	                cliente.setContrasena(resultSet.getString("contraseña"));
-	                cliente.setActivo(resultSet.getInt("activo"));
-	                cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
-	                cliente.setTipoCliente(Cliente.TipoCliente.values()[resultSet.getInt("idTipo")]);
-	                cliente.setDni(resultSet.getInt("dni"));
-	                cliente.setCuil(resultSet.getString("cuil"));
-	                cliente.setNombre(resultSet.getString("nombre"));
-	                cliente.setApellido(resultSet.getString("apellido"));
-	                cliente.setSexo(Cliente.Sexo.values()[resultSet.getInt("sexo")]);
-	                cliente.setNacionalidad(resultSet.getString("nacionalidad"));
-	                cliente.setFechaNacimiento(resultSet.getDate("fechaNacimiento").toLocalDate());
-	                cliente.setDireccion(resultSet.getString("direccion"));
+					TipoCuenta tipoCuenta = new TipoCuenta();
+					tipoCuenta.setIdTipoCuenta(resultSet.getInt("idTipoCuenta"));
+					tipoCuenta.setDescripcion(resultSet.getString("descripcion"));
 
-	                Localidad localidad = new Localidad();
-	                localidad.setId(resultSet.getInt("idLocalidad"));
-	                localidad.setNombre(resultSet.getString("localidad"));
+					cuenta.setTipoCuenta(tipoCuenta);
 
-	                Provincia provincia = new Provincia();
-	                provincia.setId(resultSet.getInt("idProvincia"));
-	                provincia.setNombre(resultSet.getString("provincia"));
+					Cliente cliente = new Cliente();
+					cliente.setIdCliente(resultSet.getInt("idCliente"));
+					cliente.setUsuario(resultSet.getString("usuario"));
+					cliente.setContrasena(resultSet.getString("contraseña"));
+					cliente.setActivo(resultSet.getInt("activo"));
+					cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
+					cliente.setTipoCliente(Cliente.TipoCliente.values()[resultSet.getInt("idTipo")]);
+					cliente.setDni(resultSet.getInt("dni"));
+					cliente.setCuil(resultSet.getString("cuil"));
+					cliente.setNombre(resultSet.getString("nombre"));
+					cliente.setApellido(resultSet.getString("apellido"));
+					cliente.setSexo(Cliente.Sexo.values()[resultSet.getInt("sexo")]);
+					cliente.setNacionalidad(resultSet.getString("nacionalidad"));
+					cliente.setFechaNacimiento(resultSet.getDate("fechaNacimiento").toLocalDate());
+					cliente.setDireccion(resultSet.getString("direccion"));
 
-	                cliente.setLocalidad(localidad);
-	                cliente.setProvincia(provincia);
-	                cliente.setCorreo(resultSet.getString("correo"));
+					Localidad localidad = new Localidad();
+					localidad.setId(resultSet.getInt("idLocalidad"));
+					localidad.setNombre(resultSet.getString("localidad"));
 
-	                cuenta.setCliente(cliente);
-	                cuentas.add(cuenta);
-	            }
-	        }
-	    } catch (SQLException e) {
-	        System.err.println("Error al listar cuentas por idCliente: " + e.getMessage());
-	    }
-	    return cuentas;
+					Provincia provincia = new Provincia();
+					provincia.setId(resultSet.getInt("idProvincia"));
+					provincia.setNombre(resultSet.getString("provincia"));
+
+					cliente.setLocalidad(localidad);
+					cliente.setProvincia(provincia);
+					cliente.setCorreo(resultSet.getString("correo"));
+
+					cuenta.setCliente(cliente);
+					cuentas.add(cuenta);
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Error al listar cuentas por idCliente: " + e.getMessage());
+		}
+		return cuentas;
 	}
-
 
 	@Override
 	public int ModificarCuenta(Cuenta cuenta) {
@@ -369,12 +381,11 @@ public class CuentaDao implements ICuentaDao {
 	public Cuenta ObtenerPorCbu(String cbu) {
 		Cuenta cuenta = null;
 
-		try (PreparedStatement statement = conexion
-				.prepareStatement("SELECT c.*, tc.descripcion, cl.contraseña, cl.usuario, cl.dni, cl.cuil, cl.nombre, cl.apellido, "
+		try (PreparedStatement statement = conexion.prepareStatement(
+				"SELECT c.*, tc.descripcion, cl.contraseña, cl.usuario, cl.dni, cl.cuil, cl.nombre, cl.apellido, "
 						+ "cl.sexo, cl.nacionalidad, cl.fechaNacimiento, cl.direccion, "
-						+ "loc.id, loc.nombre AS localidad, "
-						+ "prov.id, prov.nombre AS provincia, cl.correo " + "FROM cuenta c "
-						+ "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta "
+						+ "loc.id, loc.nombre AS localidad, " + "prov.id, prov.nombre AS provincia, cl.correo "
+						+ "FROM cuenta c " + "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta "
 						+ "INNER JOIN cliente cl ON c.idCliente = cl.idCliente "
 						+ "INNER JOIN localidades loc ON cl.idLocalidad = loc.id "
 						+ "INNER JOIN provincias prov ON cl.idProvincia = prov.id "
@@ -436,32 +447,33 @@ public class CuentaDao implements ICuentaDao {
 	}
 
 	@Override
-	public int SumarSaldo(int numeroCuenta, double saldoASumar) { //ya comprueba si no da salgo negativo.
-	    int filasActualizadas = 0;
+	public int SumarSaldo(int numeroCuenta, double saldoASumar) { // ya comprueba si no da salgo negativo.
+		int filasActualizadas = 0;
 
-	    try (PreparedStatement statement = conexion.prepareStatement("SELECT saldo FROM cuenta WHERE numero = ?")) {
-	        statement.setInt(1, numeroCuenta);
-	        ResultSet resultSet = statement.executeQuery();
+		try (PreparedStatement statement = conexion.prepareStatement("SELECT saldo FROM cuenta WHERE numero = ?")) {
+			statement.setInt(1, numeroCuenta);
+			ResultSet resultSet = statement.executeQuery();
 
-	        if (resultSet.next()) {
-	            double saldoActual = resultSet.getDouble("saldo");
-	            double nuevoSaldo = saldoActual + saldoASumar;
+			if (resultSet.next()) {
+				double saldoActual = resultSet.getDouble("saldo");
+				double nuevoSaldo = saldoActual + saldoASumar;
 
-	            // Verificar que el nuevo saldo no sea negativo
-	            if (nuevoSaldo >= 0) {
-	                try (PreparedStatement updateStatement = conexion.prepareStatement("UPDATE cuenta SET saldo = ? WHERE numero = ?")) {
-	                    updateStatement.setDouble(1, nuevoSaldo);
-	                    updateStatement.setInt(2, numeroCuenta);
+				// Verificar que el nuevo saldo no sea negativo
+				if (nuevoSaldo >= 0) {
+					try (PreparedStatement updateStatement = conexion
+							.prepareStatement("UPDATE cuenta SET saldo = ? WHERE numero = ?")) {
+						updateStatement.setDouble(1, nuevoSaldo);
+						updateStatement.setInt(2, numeroCuenta);
 
-	                    filasActualizadas = updateStatement.executeUpdate();
-	                }
-	            }
-	        }
-	    } catch (SQLException e) {
-	        System.err.println("Error al sumar saldo a la cuenta: " + e.getMessage());
-	    }
+						filasActualizadas = updateStatement.executeUpdate();
+					}
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Error al sumar saldo a la cuenta: " + e.getMessage());
+		}
 
-	    return filasActualizadas;
+		return filasActualizadas;
 	}
 
 }

@@ -9,7 +9,7 @@ public interface ICuentaDao {
 	public int Agregar(Cuenta cuenta);
 	public int SumarSaldo(int numeroCuenta, double saldo);
 	public ArrayList<Cuenta> ListarCuentasActivas(String busqueda);
-	public ArrayList<Cuenta> ListarPorIdCliente(int idCliente);
+	public ArrayList<Cuenta> ListarPorIdCliente(int idCliente, String busqueda);
 	public int ModificarCuenta(Cuenta cuenta);
 	public int EliminarCuenta(int idCuenta);
 	public int CantidadCuentasCliente(int idCliente);

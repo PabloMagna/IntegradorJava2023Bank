@@ -12,25 +12,63 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
 
-<link rel="stylesheet" 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+<script>
+	function limpiarCampos() {
+		document.getElementById("busqueda").value = "";
+		document.getElementById("saldoFiltro").value = "";
+		document.querySelector('select[name="operadorSaldo"]').selectedIndex = 0;
+		document.querySelector('[name="btnBusquedaAdmin"]').click();
+	}
+</script>
 <title>Lista de Préstamos</title>
 </head>
 <body>
 	<h1>Lista de Préstamos</h1>
-	<form method="get" action="ServletCliente">
-		<%--NADA TIENE FUNCIONALIDAD EN ESTE FORM, solo para presentar tp1 --%>
-		<label for="busqueda">Buscar:</label> <input type="text" id="busqueda"
-			name="busqueda"> <input type="submit" name="btnBusqueda"
-			value="Buscar"> <label for="edad">Importe:</label>
-		<%--NADA TIENE FUNCIONALIDAD EN ESTE FORM, solo para presentar tp1 --%>
-		<select name="operadorEdad">
-			<option value="mayor">Mayor que:</option>
-			<option value="menor">Menor que:</option>
-			<option value="igual">Igual a:</option>
-		</select> <input type="number" id="edad" name="edad">
-		<%--NADA TIENE FUNCIONALIDAD EN ESTE FORM, solo para presentar tp1 --%>
-	</form>
+
+	<div class="container mt-4" style="margin-bottom: 10px;">
+		<form method="get" action="ServletPrestamo" class="row g-3">
+			<div class="col-md-6">
+				<label for="busqueda" class="form-label">Buscar:</label>
+				<div class="input-group">
+					<input type="text" id="busqueda" name="busqueda"
+						class="form-control"
+						value="<%=(request.getParameter("busqueda") != null) ? request.getParameter("busqueda") : ""%>">
+					<button type="submit" name="btnBusquedaAdmin"
+						class="btn btn-primary">Buscar</button>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<label for="saldoFiltro" class="form-label">Importe Pedido:</label>
+				<div class="input-group">
+					<select name="operadorSaldo" class="form-select">
+						<option value="mayor"
+							<%=(request.getParameter("operadorSaldo") != null
+					&& request.getParameter("operadorSaldo").equals("mayor")) ? "selected" : ""%>>Mayor
+							que:</option>
+						<option value="menor"
+							<%=(request.getParameter("operadorSaldo") != null
+					&& request.getParameter("operadorSaldo").equals("menor")) ? "selected" : ""%>>Menor
+							que:</option>
+						<option value="igual"
+							<%=(request.getParameter("operadorSaldo") != null
+					&& request.getParameter("operadorSaldo").equals("igual")) ? "selected" : ""%>>Igual
+							a:</option>
+					</select> <input type="text" id="saldoFiltro" name="saldoFiltro"
+						class="form-control"
+						value="<%=(request.getParameter("saldoFiltro") != null) ? request.getParameter("saldoFiltro") : ""%>"
+						oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+					<button type="submit" name="btnFiltrarAdmin"
+						class="btn btn-success">Filtrar</button>
+					<button type="button" onclick="limpiarCampos()"
+						class="btn btn-secondary">Limpiar Campos</button>
+				</div>
+			</div>
+		</form>
+	</div>
+
 	<%
 		ArrayList<Prestamo> listaPrestamos = (ArrayList<Prestamo>) request.getAttribute("listaPrestamo");
 		if (listaPrestamos != null) {
@@ -93,15 +131,23 @@
 		}
 	%>
 	<script>
-		$(document).ready(function() {
-			$('#prestamosTable').DataTable({
-				"paging" : true,
-				"lengthMenu" : [ 5, 10, 25, 50, 100 ],
-				"pageLength" : 10,
-				"searching" : true,
-				"ordering" : true
-			});
-		});
+		$(document)
+				.ready(
+						function() {
+							$('#prestamosTable')
+									.DataTable(
+											{
+												"paging" : true,
+												"lengthMenu" : [ 5, 10, 25, 50,
+														100 ],
+												"pageLength" : 10,
+												"searching" : false,
+												"ordering" : true,
+												"language" : {
+													"emptyTable" : "No hay prestamos pendientes disponibles en la tabla"
+												}
+											});
+						});
 	</script>
 </body>
 </html>

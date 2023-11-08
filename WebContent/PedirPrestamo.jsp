@@ -39,10 +39,17 @@
 				<label for="importe">Importe:</label> <input type="text"
 					name="importe" class="form-control" required>
 			</div>
+			
 			<div class="form-group">
-				<label for="cuotas">Cuotas:</label> <input type="text" name="cuotas"
+				<label for="cuotas">Cuotas:</label> <select name="cuotas"
 					class="form-control" required>
+					<option value="3">3</option>
+					<option value="6">6</option>
+					<option value="12">12</option>
+					<option value="24">24</option>
+				</select>
 			</div>
+
 			<button type="submit" name="btnPedirPrestamo" class="btn btn-primary">Solicitar
 				Préstamo</button>
 		</form>

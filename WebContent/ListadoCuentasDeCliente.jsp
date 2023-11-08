@@ -22,30 +22,69 @@
 	href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
 <script>
+	function limpiarCampos() {
+		document.getElementById("busqueda").value = "";
+		document.getElementById("saldoFiltro").value = "";
+		document.querySelector('select[name="operadorSaldo"]').selectedIndex = 0;
+		// Simular el clic en el botón "Buscar" después de limpiar los campos
+		document.querySelector('[name="btnBusquedaCl"]').click();
+	}
 	$(document).ready(function() {
 		$('#cuentasTable').DataTable({
-			"paging" : true, // Habilita la paginación
-			"lengthMenu" : [ 5, 10, 25, 50, 100 ], // Define las opciones de cantidad de filas por página
-			"pageLength" : 10, // Establece la cantidad de filas por página predeterminada
-			"searching" : true, // Habilita la búsqueda
-			"ordering" : true, // Habilita el ordenamiento
-		// Otras opciones de configuración según tus necesidades
+			"paging" : true, 
+			"lengthMenu" : [ 5, 10, 25, 50, 100 ], 
+			"pageLength" : 10, 
+			"searching" : false,
+			"ordering" : true,
+			"language": {
+	            "emptyTable": "El cliente no posee cuentas activas"
+	        }
 		});
 	});
 </script>
 </head>
 <body>
+
 	<h1>Listado de Cuentas</h1>
-	<form method="get" action="ServletCliente">
-		<label for="busqueda">Buscar:</label> <input type="text" id="busqueda"
-			name="busqueda"> <input type="submit" name="btnBusqueda"
-			value="Buscar"> <label for="edad">Saldo:</label> <select
-			name="operadorEdad">
-			<option value="mayor">Mayor que:</option>
-			<option value="menor">Menor que:</option>
-			<option value="igual">Igual a:</option>
-		</select> <input type="number" id="edad" name="edad">
-	</form>
+	<div class="container mt-4" style="margin-bottom: 10px;">
+		<form method="get" action="ServletCuenta" class="row g-3">
+			<div class="col-md-6">
+				<label for="busqueda" class="form-label">Buscar:</label>
+				<div class="input-group">
+					<input type="text" id="busqueda" name="busqueda"
+						class="form-control"
+						value="<%=(request.getParameter("busqueda") != null) ? request.getParameter("busqueda") : ""%>">
+					<button type="submit" name="btnBusquedaCl" class="btn btn-primary">Buscar</button>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<label for="saldoFiltro" class="form-label">Saldo:</label>
+				<div class="input-group">
+					<select name="operadorSaldo" class="form-select">
+						<option value="mayor"
+							<%=(request.getParameter("operadorSaldo") != null
+					&& request.getParameter("operadorSaldo").equals("mayor")) ? "selected" : ""%>>Mayor
+							que:</option>
+						<option value="menor"
+							<%=(request.getParameter("operadorSaldo") != null
+					&& request.getParameter("operadorSaldo").equals("menor")) ? "selected" : ""%>>Menor
+							que:</option>
+						<option value="igual"
+							<%=(request.getParameter("operadorSaldo") != null
+					&& request.getParameter("operadorSaldo").equals("igual")) ? "selected" : ""%>>Igual
+							a:</option>
+					</select> <input type="text" id="saldoFiltro" name="saldoFiltro"
+						class="form-control"
+						value="<%=(request.getParameter("saldoFiltro") != null) ? request.getParameter("saldoFiltro") : ""%>"
+						oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+					<button type="submit" name="btnFiltrarCl" class="btn btn-success">Filtrar</button>
+					<button type="button" onclick="limpiarCampos()"
+						class="btn btn-secondary">Limpiar Campos</button>
+				</div>
+			</div>
+		</form>
+	</div>
+
 	<table border="1" id="cuentasTable" class="display">
 		<thead>
 			<tr>
@@ -67,7 +106,7 @@
 				for (Cuenta cuenta : listaCuentas) {
 		%>
 		<tr>
-			<td><%=cuenta.getCliente().getIdCliente() %></td>
+			<td><%=cuenta.getCliente().getIdCliente()%></td>
 			<td><%=cuenta.getNumero()%></td>
 			<td><%=cuenta.getCBU()%></td>
 			<td><%=cuenta.getSaldo()%></td>

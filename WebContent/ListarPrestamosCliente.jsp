@@ -21,13 +21,29 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
 <script>
+	function limpiarCampos() {
+		document.getElementById("busqueda").value = "";
+		document.getElementById("saldoFiltro").value = "";
+		document.querySelector('select[name="operadorSaldo"]').selectedIndex = 0;
+		document.querySelector('[name="btnBusquedaCliente"]').click();
+	}
 	$(document).ready(function() {
-		$('#prestamosTable').DataTable();
+		$('#prestamosTable').DataTable({
+			"paging" : true,
+			"lengthMenu" : [ 5, 10, 25, 50, 100 ],
+			"pageLength" : 10,
+			"searching" : true,
+			"ordering" : true,
+			"language" : {
+				"emptyTable" : "No hay préstamos disponibles para pagar"
+			}
+		});
 	});
 </script>
 </head>
 <body>
 	<h1>Lista de Préstamos</h1>
+
 
 	<form action="ServletPrestamo" method="post">
 		<table border="1" id="prestamosTable" class="display">

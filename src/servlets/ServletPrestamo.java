@@ -38,6 +38,10 @@ public class ServletPrestamo extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		/////////////
+		// CLIENTE
+
 		if (request.getParameter("pedirPrestamo") != null) {
 
 			HttpSession session = request.getSession();
@@ -51,7 +55,7 @@ public class ServletPrestamo extends HttpServlet {
 
 			response.sendRedirect("PedirPrestamo.jsp");
 		}
-		
+
 		if (request.getParameter("listaPagar") != null) {
 			HttpSession session = request.getSession();
 			Cliente cliente = (Cliente) session.getAttribute("cliente");
@@ -63,25 +67,112 @@ public class ServletPrestamo extends HttpServlet {
 			request.setAttribute("listaCuotas", listaCuotas);
 
 			CuentaNegocio cuentaNegocio = new CuentaNegocio();
-			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente);
+			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, null);
 
 			request.setAttribute("listaCuentas", listaCuentas);
 
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
 			dispatcher.forward(request, response);
 		}
-		
-		
+		// BUSCAR (ESTO NO VALE LA PENA
+		/*if (request.getParameter("btnBusquedaCliente") != null) {
+			HttpSession session = request.getSession();
+			Cliente cliente = (Cliente) session.getAttribute("cliente");
+			int idCliente = cliente.getIdCliente();
+			
+			String busqueda = request.getParameter("busqueda");
+			
+			CuotaNegocio cuotaNegocio = new CuotaNegocio();
+			ArrayList<Cuota> listaCuotas = cuotaNegocio.ListarPorClienteAprobadoEImpago(idCliente);
+
+			request.setAttribute("listaCuotas", listaCuotas);
+
+			CuentaNegocio cuentaNegocio = new CuentaNegocio();
+			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, busqueda);
+
+			request.setAttribute("listaCuentas", listaCuentas);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
+			dispatcher.forward(request, response);
+		}
+		// FILTRAR
+		if (request.getParameter("btnFiltrarCliente") != null) {
+			HttpSession session = request.getSession();
+			Cliente cliente = (Cliente) session.getAttribute("cliente");
+			int idCliente = cliente.getIdCliente();
+			
+			String tipoFiltro = request.getParameter("operadorSaldo");
+			String saldoFiltroStr = request.getParameter("saldoFiltro");
+			double saldoFiltro = (saldoFiltroStr != null && !saldoFiltroStr.isEmpty())
+					? Double.parseDouble(saldoFiltroStr)
+					: 0.0;
+			String busqueda = request.getParameter("busqueda");
+
+			CuotaNegocio cuotaNegocio = new CuotaNegocio();
+			ArrayList<Cuota> listaCuotas = cuotaNegocio.ListarPorClienteAprobadoEImpago(idCliente);
+
+			request.setAttribute("listaCuotas", listaCuotas);
+
+			CuentaNegocio cuentaNegocio = new CuentaNegocio();
+			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, busqueda);
+
+			request.setAttribute("listaCuentas", listaCuentas);
+
+
+			request.setAttribute("operadorSaldo", tipoFiltro);
+			request.setAttribute("busqueda", busqueda);
+			request.setAttribute("saldoFiltro", saldoFiltro);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
+			dispatcher.forward(request, response);
+		}*/
+
+		/////////////////////////////////////
 		// ADMIN ----------------------------------------
 		if (request.getParameter("lista") != null) {
+
 			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
-			ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes();
+			ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes(null);
 
 			request.setAttribute("listaPrestamo", listaPrestamos);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
 			dispatcher.forward(request, response);
 		}
-		
+		// BUSCAR
+		if (request.getParameter("btnBusquedaAdmin") != null) {
+			String busqueda = request.getParameter("busqueda");
+
+			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
+			ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes(busqueda);
+
+			request.setAttribute("listaPrestamo", listaPrestamos);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
+			dispatcher.forward(request, response);
+		}
+		// FILTRAR
+		if (request.getParameter("btnFiltrarAdmin") != null) {
+
+			String tipoFiltro = request.getParameter("operadorSaldo");
+			String saldoFiltroStr = request.getParameter("saldoFiltro");
+			double saldoFiltro = (saldoFiltroStr != null && !saldoFiltroStr.isEmpty())
+					? Double.parseDouble(saldoFiltroStr)
+					: 0.0;
+			String busqueda = request.getParameter("busqueda");
+
+			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
+			ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes(busqueda);
+			listaPrestamos = prestamoNegocio.filtrarLista(listaPrestamos, tipoFiltro, saldoFiltro);
+
+			request.setAttribute("listaPrestamo", listaPrestamos);
+
+			request.setAttribute("operadorSaldo", tipoFiltro);
+			request.setAttribute("busqueda", busqueda);
+			request.setAttribute("saldoFiltro", saldoFiltro);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
+			dispatcher.forward(request, response);
+		}
 
 	}
 
@@ -90,14 +181,13 @@ public class ServletPrestamo extends HttpServlet {
 		if (request.getParameter("btnPedirPrestamo") != null) {
 			HttpSession session = request.getSession();
 			Cuenta cuenta = (Cuenta) session.getAttribute("cuentaPrestamo");
-			
+
 			Cliente cliente = (Cliente) session.getAttribute("cliente");
 
 			Prestamo prestamo = new Prestamo();
-			
+
 			cuenta.setCliente(cliente);
 			prestamo.setCuenta(cuenta);
-
 
 			int cuotas = Integer.parseInt(request.getParameter("cuotas"));
 			prestamo.setCuotas(cuotas);
@@ -110,8 +200,8 @@ public class ServletPrestamo extends HttpServlet {
 			boolean exito = prestamoNegocio.PedirPrestamo(prestamo);
 
 			if (exito) {
-			    session.setAttribute("cuentaPrestamo", null);
-			    response.sendRedirect(request.getContextPath() + "/ServletCuenta?listaPorId=1"); 
+				session.setAttribute("cuentaPrestamo", null);
+				response.sendRedirect(request.getContextPath() + "/ServletCuenta?listaPorId=1");
 			}
 
 		}
@@ -124,8 +214,7 @@ public class ServletPrestamo extends HttpServlet {
 			Prestamo prestamo = prestamoNegocio.ObtenerPrestamoPorId(idPrestamo);
 			CuentaNegocio cuentaNegocio = new CuentaNegocio();
 			Cuenta cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(prestamo.getCuenta().getNumero());
-			
-			
+
 			// Generar movimiento
 			Movimiento movimiento = new Movimiento();
 			movimiento.setDetalle("Suma por préstamo aprobado");
@@ -134,15 +223,15 @@ public class ServletPrestamo extends HttpServlet {
 			movimiento.setCuenta(cuenta);
 
 			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
-			movimientoNegocio.Agregar(movimiento); 
+			movimientoNegocio.Agregar(movimiento);
 
 			// Generar Cuotas
 			CuotaNegocio cuotaNegocio = new CuotaNegocio();
 			if (cuotaNegocio.GenerarCuotas(prestamo)) {
 
-				ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes();
+				ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes(null);
 				request.setAttribute("listaPrestamo", listaPrestamos);
-				
+
 				RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
 				dispatcher.forward(request, response);
 			}
@@ -160,19 +249,17 @@ public class ServletPrestamo extends HttpServlet {
 			int idCuota = Integer.parseInt(request.getParameter("cuota"));
 			double importe = Double.parseDouble(request.getParameter("importe"));
 			int numeroCuenta = Integer.parseInt(request.getParameter("cuenta"));
-			
-			Cuenta cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(numeroCuenta);
 
+			Cuenta cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(numeroCuenta);
 
 			CuentaNegocio cuentaNegocio = new CuentaNegocio();
 			boolean exitoCuenta = cuentaNegocio.SumarSaldo(numeroCuenta, importe * (-1));
-			
 
 			if (exitoCuenta) {
-				
+
 				CuotaNegocio cuotaNegocio = new CuotaNegocio();
 				boolean exitoCuota = cuotaNegocio.PagarCuota(idCuota);
-				if(exitoCuota) {
+				if (exitoCuota) {
 					Movimiento movimiento = new Movimiento();
 					movimiento.setDetalle("Pago de cuota de Préstamo");
 					movimiento.setIdTipoMovimiento(new TipoMovimiento(3));
@@ -181,14 +268,14 @@ public class ServletPrestamo extends HttpServlet {
 
 					MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
 					movimientoNegocio.Agregar(movimiento);
-					
+
 					RequestDispatcher dispatcher = request.getRequestDispatcher("Inicio.jsp");
 					dispatcher.forward(request, response);
-				}			
-			}else {
+				}
+			} else {
 				System.out.println("no hay fondos");
-				
-				//aca hay que mopstrar alertas
+
+				// aca hay que mopstrar alertas
 			}
 		}
 	}

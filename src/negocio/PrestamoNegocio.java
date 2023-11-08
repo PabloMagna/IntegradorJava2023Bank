@@ -3,6 +3,7 @@ package negocio;
 import java.util.ArrayList;
 
 import dao.PrestamoDao;
+import entidad.Movimiento;
 import entidad.Prestamo;
 import entidad.Prestamo.Estado;
 import interfazNegocio.IPrestamoNegocio;
@@ -16,9 +17,9 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 	}
 
 	@Override
-	public ArrayList<Prestamo> ListarPendientes() {
+	public ArrayList<Prestamo> ListarPendientes(String busqueda) {
 		// TODO Auto-generated method stub
-		return dao.ListarPendientes();
+		return dao.ListarPendientes(busqueda);
 	}
 
 	@Override
@@ -41,5 +42,30 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 	public ArrayList<Prestamo> ListarPorClienteAprobados(int idCliente) {
 		return dao.ListarPorClienteAprobados(idCliente);
 	}
-	
+	public ArrayList<Prestamo> filtrarLista(ArrayList<Prestamo> listaOriginal, String tipoFiltro, double saldoFiltro) {
+	    ArrayList<Prestamo> listaFiltrada = new ArrayList<>();
+
+	    if (saldoFiltro == 0.0) {
+	        return listaOriginal; // No aplicar ningún filtro y devolver la lista completa
+	    }
+
+	    for (Prestamo prestamo : listaOriginal) {
+	        boolean cumpleCondición = false;
+	        double saldo = prestamo.getImportePedido();
+
+	        if (tipoFiltro.equals("mayor")) {
+	            cumpleCondición = (saldo > saldoFiltro);
+	        } else if (tipoFiltro.equals("menor")) {
+	            cumpleCondición = (saldo < saldoFiltro);
+	        } else if (tipoFiltro.equals("igual")) {
+	            cumpleCondición = (saldo == saldoFiltro);
+	        }
+
+	        if (cumpleCondición) {
+	            listaFiltrada.add(prestamo);
+	        }
+	    }
+
+	    return listaFiltrada;
+	}
 }

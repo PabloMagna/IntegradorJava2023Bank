@@ -28,8 +28,8 @@ public class CuentaNegocio implements ICuentaNegocio {
 	}
 
 	@Override
-	public ArrayList<Cuenta> ListarPorIdCliente(int idCliente) {
-		return dao.ListarPorIdCliente(idCliente);
+	public ArrayList<Cuenta> ListarPorIdCliente(int idCliente, String busqueda) {
+		return dao.ListarPorIdCliente(idCliente, busqueda);
 	}
 
 	@Override

@@ -129,7 +129,7 @@ public class ServletCuenta extends HttpServlet {
 			dispatcher.forward(request, response);
 		}
 
-// CLIENTE ------------------------------------------------------
+		// CLIENTE ------------------------------------------------------
 
 		if (request.getParameter("listaPorId") != null) {
 			// Obtener el cliente de la sesión
@@ -142,9 +142,12 @@ public class ServletCuenta extends HttpServlet {
 				int idCliente = cliente.getIdCliente();
 
 				// Usar el CuentaNegocio para listar las cuentas del cliente por su ID
-				ArrayList<Cuenta> cuentas = cuentaNegocio.ListarPorIdCliente(idCliente);
+				ArrayList<Cuenta> cuentas = cuentaNegocio.ListarPorIdCliente(idCliente, null);
 				request.setAttribute("listaCuentas", cuentas);
 
+				request.setAttribute("operadorSaldo", "mayor");
+				request.setAttribute("busqueda", "");
+				request.setAttribute("saldoFiltro", "");
 
 				RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoCuentasDeCliente.jsp");
 				dispatcher.forward(request, response);
@@ -152,14 +155,59 @@ public class ServletCuenta extends HttpServlet {
 				response.sendRedirect("error.jsp");
 			}
 		}
-		
+		// BUSCAR
+		if (request.getParameter("btnBusquedaCl") != null) {
+			HttpSession session = request.getSession();
+			Cliente cliente = (Cliente) session.getAttribute("cliente");
+
+			int idCliente = cliente.getIdCliente();
+			String busqueda = request.getParameter("busqueda");
+
+			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, busqueda);
+
+			request.setAttribute("listaCuentas", listaCuentas);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoCuentasDeCliente.jsp");
+			dispatcher.forward(request, response);
+		}
+		// FILTRAR
+		if (request.getParameter("btnFiltrarCl") != null) {
+			HttpSession session = request.getSession();
+			Cliente cliente = (Cliente) session.getAttribute("cliente");
+
+			int idCliente = cliente.getIdCliente();
+
+			String tipoFiltro = request.getParameter("operadorSaldo");
+			String saldoFiltroStr = request.getParameter("saldoFiltro");
+			double saldoFiltro = (saldoFiltroStr != null && !saldoFiltroStr.isEmpty())
+					? Double.parseDouble(saldoFiltroStr)
+					: 0.0;
+			String busqueda = request.getParameter("busqueda");
+
+			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, busqueda);
+			listaCuentas = cuentaNegocio.filtrarLista(listaCuentas, tipoFiltro, saldoFiltro);
+
+			request.setAttribute("listaCuentas", listaCuentas);
+
+			request.setAttribute("operadorSaldo", tipoFiltro);
+			request.setAttribute("busqueda", busqueda);
+			request.setAttribute("saldoFiltro", saldoFiltro);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoCuentasDeCliente.jsp");
+			dispatcher.forward(request, response);
+		}
+
 		if (request.getParameter("transferencia") != null) {
 			int numeroCuenta = Integer.parseInt(request.getParameter("transferencia"));
 			Cuenta cuentaOrigen = cuentaNegocio.ObtenerPorNumeroCuenta(numeroCuenta);
-			
+
 			System.out.print(cuentaOrigen.toString());
 
 			HttpSession session = request.getSession();
+
+			request.setAttribute("operadorSaldo", "mayor");
+			request.setAttribute("busqueda", "");
+			request.setAttribute("saldoFiltro", "");
 
 			session.removeAttribute("cuentaOrigen");
 
@@ -168,12 +216,60 @@ public class ServletCuenta extends HttpServlet {
 			// Luego, puedes redirigir a la página de transferencia
 			response.sendRedirect("Transferencia.jsp");
 		}
+
+		// HISTORIAL GENERAL
 		if (request.getParameter("historial") != null) {
 			int numeroCuenta = Integer.parseInt(request.getParameter("historial"));
 			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
 
-			ArrayList<Movimiento> movimientos = movimientoNegocio.ListarPorNumeroCuenta(numeroCuenta);
+			// Obtén la sesión actual
+			HttpSession session = request.getSession();
+
+			// Almacena el número de cuenta en la sesión
+			session.setAttribute("numeroCuenta", numeroCuenta);
+
+			ArrayList<Movimiento> movimientos = movimientoNegocio.ListarPorNumeroCuenta(numeroCuenta, null);
 			request.setAttribute("movimientos", movimientos);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("Historial.jsp");
+			dispatcher.forward(request, response);
+		}
+		// BUSCAR HISTORIAL
+		if (request.getParameter("btnBusquedaHistorial") != null) {
+			String busqueda = request.getParameter("busqueda");
+			HttpSession session = request.getSession();
+			Integer numeroCuenta = (Integer) session.getAttribute("numeroCuenta");
+
+			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
+			ArrayList<Movimiento> movimientos = movimientoNegocio.ListarPorNumeroCuenta(numeroCuenta, busqueda);
+
+			request.setAttribute("movimientos", movimientos);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("Historial.jsp");
+			dispatcher.forward(request, response);
+		}
+
+		// FILTRAR HISTORIAL
+		if (request.getParameter("btnFiltrarHistorial") != null) {
+			String busqueda = request.getParameter("busqueda");
+			HttpSession session = request.getSession();
+			Integer numeroCuenta = (Integer) session.getAttribute("numeroCuenta");
+
+			String tipoFiltro = request.getParameter("operadorSaldo");
+			String saldoFiltroStr = request.getParameter("saldoFiltro");
+			double saldoFiltro = (saldoFiltroStr != null && !saldoFiltroStr.isEmpty())
+					? Double.parseDouble(saldoFiltroStr)
+					: -100000000000000.0;
+
+			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
+			ArrayList<Movimiento> movimientos = movimientoNegocio.ListarPorNumeroCuenta(numeroCuenta, busqueda);
+			movimientos = movimientoNegocio.filtrarLista(movimientos, tipoFiltro, saldoFiltro);
+
+			request.setAttribute("movimientos", movimientos);
+
+			request.setAttribute("operadorSaldo", tipoFiltro);
+			request.setAttribute("busqueda", busqueda);
+			request.setAttribute("saldoFiltro", saldoFiltro);
 
 			RequestDispatcher dispatcher = request.getRequestDispatcher("Historial.jsp");
 			dispatcher.forward(request, response);
@@ -198,7 +294,7 @@ public class ServletCuenta extends HttpServlet {
 			cuenta.setTipoCuenta(tipoCuenta);
 
 			CuentaNegocio cuentaNegocio = new CuentaNegocio();
-			int numeroCuenta = cuentaNegocio.Agregar(cuenta);		
+			int numeroCuenta = cuentaNegocio.Agregar(cuenta);
 
 			request.setAttribute("idCliente", idCliente);
 
@@ -212,18 +308,18 @@ public class ServletCuenta extends HttpServlet {
 				dispatcher.forward(request, response);
 				return;
 			}
-			
+
 			cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(numeroCuenta);
-			
+
 			Movimiento movimiento = new Movimiento();
 			movimiento.setCuenta(cuenta);
 			movimiento.setImporte(10000);
 			movimiento.setIdTipoMovimiento(new TipoMovimiento(1));
 			movimiento.setDetalle("Dinero Incial Alta de Cuenta");
-			
+
 			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
 			movimientoNegocio.Agregar(movimiento);
-			
+
 			request.setAttribute("advertencia", "exito");
 			ArrayList<TipoCuenta> tiposCuenta = cuentaNegocio.ListarTipoCuenta();
 			request.setAttribute("tiposCuenta", tiposCuenta);
@@ -278,9 +374,9 @@ public class ServletCuenta extends HttpServlet {
 				response.sendRedirect("error.jsp");
 			}
 		}
-		
-		//CLIENTE -----------------
-		
+
+		// CLIENTE -----------------
+
 		if (request.getParameter("btnTransferir") != null) {
 
 			double importe = Double.parseDouble(request.getParameter("importe"));
@@ -304,28 +400,25 @@ public class ServletCuenta extends HttpServlet {
 				request.setAttribute("errorMensaje", "No se puede transferir a la misma cuenta.");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
 				dispatcher.forward(request, response);
-				return; 
+				return;
 			}
 
-			
-			boolean existeSaldo = cuentaNegocio.SumarSaldo(cuentaOrigen.getNumero(), importe*-1);
-			
-			if(existeSaldo) {
+			boolean existeSaldo = cuentaNegocio.SumarSaldo(cuentaOrigen.getNumero(), importe * -1);
+
+			if (existeSaldo) {
 				cuentaNegocio.SumarSaldo(cuentaDestino.getNumero(), importe);
 
 				Movimiento movimientoOrigen = new Movimiento();
 				movimientoOrigen.setCuenta(cuentaOrigen);
-				movimientoOrigen.setImporte(-importe); 
-				movimientoOrigen.setIdTipoMovimiento(new TipoMovimiento(4)); 
+				movimientoOrigen.setImporte(-importe);
+				movimientoOrigen.setIdTipoMovimiento(new TipoMovimiento(4));
 				movimientoOrigen.setDetalle("Resta por transferencia");
 
-			
 				Movimiento movimientoDestino = new Movimiento();
 				movimientoDestino.setCuenta(cuentaDestino);
 				movimientoDestino.setImporte(importe);
 				movimientoDestino.setIdTipoMovimiento(new TipoMovimiento(5));
 				movimientoDestino.setDetalle("Suma por transferencia");
-
 
 				MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
 				movimientoNegocio.Agregar(movimientoOrigen);
@@ -334,15 +427,14 @@ public class ServletCuenta extends HttpServlet {
 				request.setAttribute("errorMensaje", "Transferencia exitosa.");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
 				dispatcher.forward(request, response);
-			}else {
-				
+			} else {
+
 				request.setAttribute("errorMensaje", "Cuenta de Origen no tiene fondos suficientes");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
 				dispatcher.forward(request, response);
 				return;
 			}
 
-			
 		}
 
 	}

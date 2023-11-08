@@ -26,12 +26,10 @@ public class MovimientoDao implements IMovimientoDao {
 		conexion = Conexion.obtenerConexion();
 	}
 
-	public ArrayList<Movimiento> ListarPorNumeroCuenta(int numeroCuenta) {
+	public ArrayList<Movimiento> ListarPorNumeroCuenta(int numeroCuenta, String busqueda) {
 		ArrayList<Movimiento> listaMovimientos = new ArrayList<>();
 
 		try {
-			// Crea la consulta SQL para obtener los movimientos de la cuenta específica,
-			// ordenados por ID descendente
 			String query = "SELECT m.idMovimiento, m.detalle, m.importe, m.idTipoMovimiento, t.descripcion, m.fecha, "
 					+ "c.numero AS numeroCuenta, c.CBU, c.saldo, c.fecha AS fechaCuenta, c.activo AS activoCuenta, "
 					+ "c.idTipoCuenta, cl.idCliente, cl.usuario, cl.contraseña, cl.activo AS activoCliente, "
@@ -41,12 +39,23 @@ public class MovimientoDao implements IMovimientoDao {
 					+ "cl.correo " + "FROM movimiento m "
 					+ "INNER JOIN tiposmovimiento t ON m.idTipoMovimiento = t.idTipoMovimiento "
 					+ "INNER JOIN cuenta c ON m.numeroCuenta = c.numero "
-					+ "INNER JOIN cliente cl ON c.idCliente = cl.idCliente "
-					+ "WHERE m.numeroCuenta = ? ORDER BY m.idMovimiento DESC";
+					+ "INNER JOIN cliente cl ON c.idCliente = cl.idCliente " + "WHERE m.numeroCuenta = ?";
+
+			if (busqueda != null) {
+				query += " AND (m.detalle LIKE ? OR m.fecha LIKE ? OR t.descripcion LIKE ?)";
+			}
+
+			query += " ORDER BY m.idMovimiento DESC";
 
 			// Crea una instancia de PreparedStatement con la consulta
 			PreparedStatement preparedStatement = conexion.prepareStatement(query);
 			preparedStatement.setInt(1, numeroCuenta); // Asigna el valor del número de cuenta
+
+			if (busqueda != null) {
+				preparedStatement.setString(2, "%" + busqueda + "%"); // Búsqueda en detalle
+				preparedStatement.setString(3, "%" + busqueda + "%"); // Búsqueda en fecha
+				preparedStatement.setString(4, "%" + busqueda + "%"); // Búsqueda en descripción del tipo de movimiento
+			}
 
 			// Ejecuta la consulta
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -152,29 +161,23 @@ public class MovimientoDao implements IMovimientoDao {
 	@Override
 	public int Agregar(Movimiento movimiento) {
 		try {
-			// Define la consulta SQL para insertar un nuevo movimiento
 			String query = "INSERT INTO movimiento (numeroCuenta, detalle, importe, idTipoMovimiento, fecha) VALUES (?, ?, ?, ?, ?)";
 
-			// Crea una instancia de PreparedStatement con la consulta
 			PreparedStatement preparedStatement = conexion.prepareStatement(query);
 
-			// Establece los valores de los parámetros
 			preparedStatement.setInt(1, movimiento.getCuenta().getNumero());
 			preparedStatement.setString(2, movimiento.getDetalle());
 			preparedStatement.setDouble(3, movimiento.getImporte());
 			preparedStatement.setInt(4, movimiento.getIdTipoMovimiento().getIdTipoMovimiento());
 
-			// Verifica si la fecha es nula y, si lo es, establece la fecha actual
 			LocalDate fecha = movimiento.getFecha();
 			if (fecha == null) {
 				fecha = LocalDate.now();
 			}
 			preparedStatement.setDate(5, Date.valueOf(fecha));
 
-			// Ejecuta la consulta para insertar el nuevo movimiento
 			int filasInsertadas = preparedStatement.executeUpdate();
 
-			// Cierra el recurso
 			preparedStatement.close();
 
 			return filasInsertadas;
