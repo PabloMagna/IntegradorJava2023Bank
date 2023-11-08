@@ -168,6 +168,16 @@ public class ServletCuenta extends HttpServlet {
 			// Luego, puedes redirigir a la página de transferencia
 			response.sendRedirect("Transferencia.jsp");
 		}
+		if (request.getParameter("historial") != null) {
+			int numeroCuenta = Integer.parseInt(request.getParameter("historial"));
+			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
+
+			ArrayList<Movimiento> movimientos = movimientoNegocio.ListarPorNumeroCuenta(numeroCuenta);
+			request.setAttribute("movimientos", movimientos);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("Historial.jsp");
+			dispatcher.forward(request, response);
+		}
 
 	}
 
