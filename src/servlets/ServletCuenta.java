@@ -188,7 +188,7 @@ public class ServletCuenta extends HttpServlet {
 			cuenta.setTipoCuenta(tipoCuenta);
 
 			CuentaNegocio cuentaNegocio = new CuentaNegocio();
-			int numeroCuenta = cuentaNegocio.Agregar(cuenta);
+			int numeroCuenta = cuentaNegocio.Agregar(cuenta);		
 
 			request.setAttribute("idCliente", idCliente);
 
@@ -202,6 +202,18 @@ public class ServletCuenta extends HttpServlet {
 				dispatcher.forward(request, response);
 				return;
 			}
+			
+			cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(numeroCuenta);
+			
+			Movimiento movimiento = new Movimiento();
+			movimiento.setCuenta(cuenta);
+			movimiento.setImporte(10000);
+			movimiento.setIdTipoMovimiento(new TipoMovimiento(1));
+			movimiento.setDetalle("Dinero Incial Alta de Cuenta");
+			
+			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
+			movimientoNegocio.Agregar(movimiento);
+			
 			request.setAttribute("advertencia", "exito");
 			ArrayList<TipoCuenta> tiposCuenta = cuentaNegocio.ListarTipoCuenta();
 			request.setAttribute("tiposCuenta", tiposCuenta);
@@ -260,19 +272,17 @@ public class ServletCuenta extends HttpServlet {
 		//CLIENTE -----------------
 		
 		if (request.getParameter("btnTransferir") != null) {
-			// Obtener el importe y la cuenta de origen de la solicitud
+
 			double importe = Double.parseDouble(request.getParameter("importe"));
 			Cuenta cuentaOrigen = (Cuenta) request.getSession().getAttribute("cuentaOrigen");
 
-			// Obtener el CBU de la cuenta destino desde la solicitud
 			String cbuDestino = request.getParameter("cbu");
 
-			// Llamar al método para obtener la cuenta de destino por CBU
 			Cuenta cuentaDestino = cuentaNegocio.ObtenerPorCbu(cbuDestino);
 
-			// Verificar si se encontró la cuenta destino
+			// Validaciones
 			if (cuentaDestino == null) {
-				// Mostrar un mensaje de error
+
 				request.setAttribute("errorMensaje", "El CBU de destino no se encontró.");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
 				dispatcher.forward(request, response);
@@ -280,54 +290,49 @@ public class ServletCuenta extends HttpServlet {
 			}
 
 			if (cuentaOrigen.getNumero() == cuentaDestino.getNumero()) {
-				// Mostrar un mensaje de error
+
 				request.setAttribute("errorMensaje", "No se puede transferir a la misma cuenta.");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
 				dispatcher.forward(request, response);
-				return; // Detener la ejecución
+				return; 
 			}
 
-			// Verificar si hay fondos suficientes para la transferencia
-			if (cuentaOrigen.getSaldo() < importe) {
-				// Mostrar un mensaje de error
-				request.setAttribute("errorMensaje", "Saldo insuficiente para realizar la transferencia.");
+			
+			boolean existeSaldo = cuentaNegocio.SumarSaldo(cuentaOrigen.getNumero(), importe*-1);
+			
+			if(existeSaldo) {
+				cuentaNegocio.SumarSaldo(cuentaDestino.getNumero(), importe);
+
+				Movimiento movimientoOrigen = new Movimiento();
+				movimientoOrigen.setCuenta(cuentaOrigen);
+				movimientoOrigen.setImporte(-importe); 
+				movimientoOrigen.setIdTipoMovimiento(new TipoMovimiento(4)); 
+				movimientoOrigen.setDetalle("Resta por transferencia");
+
+			
+				Movimiento movimientoDestino = new Movimiento();
+				movimientoDestino.setCuenta(cuentaDestino);
+				movimientoDestino.setImporte(importe);
+				movimientoDestino.setIdTipoMovimiento(new TipoMovimiento(5));
+				movimientoDestino.setDetalle("Suma por transferencia");
+
+
+				MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
+				movimientoNegocio.Agregar(movimientoOrigen);
+				movimientoNegocio.Agregar(movimientoDestino);
+
+				request.setAttribute("errorMensaje", "Transferencia exitosa.");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
 				dispatcher.forward(request, response);
-				return; // Detener la ejecución
+			}else {
+				
+				request.setAttribute("errorMensaje", "Cuenta de Origen no tiene fondos suficientes");
+				RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
+				dispatcher.forward(request, response);
+				return;
 			}
 
-			// Deduct the transfer amount from the account of origin
-			cuentaOrigen.setSaldo(cuentaOrigen.getSaldo() - importe);
-
-			// Add the transfer amount to the destination account
-			cuentaDestino.setSaldo(cuentaDestino.getSaldo() + importe);
-
-			cuentaNegocio.ModificarCuenta(cuentaOrigen);
-			cuentaNegocio.ModificarCuenta(cuentaDestino);
-			/*
-			// Create a movement for the origin account (Resta por transferencia)
-			Movimiento movimientoOrigen = new Movimiento();
-			movimientoOrigen.setNumeroCuenta(cuentaOrigen.getNumero());
-			movimientoOrigen.setImporte(-importe); // Importe negativo
-			movimientoOrigen.setIdTipoMovimiento(new TipoMovimiento(4)); // Establece el tipo
-			movimientoOrigen.setDetalle("Resta por transferencia");
-
-			// Create a movement for the destination account (Suma por transferencia)
-			Movimiento movimientoDestino = new Movimiento();
-			movimientoDestino.setNumeroCuenta(cuentaDestino.getNumero());
-			movimientoDestino.setImporte(importe);
-			movimientoDestino.setIdTipoMovimiento(new TipoMovimiento(5));
-			movimientoDestino.setDetalle("Suma por transferencia");
-
-			// Llama a los métodos para agregar estos movimientos en la base de datos
-			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
-			movimientoNegocio.Agregar(movimientoOrigen);
-			movimientoNegocio.Agregar(movimientoDestino);*/
-
-			// Después de la transferencia exitosa
-			request.setAttribute("errorMensaje", "Transferencia exitosa.");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("Transferencia.jsp");
-			dispatcher.forward(request, response);
+			
 		}
 
 	}

@@ -122,16 +122,19 @@ public class ServletPrestamo extends HttpServlet {
 			prestamoNegocio.CambiarEstadoPrestamo(idPrestamo, Estado.APROBADO);
 
 			Prestamo prestamo = prestamoNegocio.ObtenerPrestamoPorId(idPrestamo);
-
+			CuentaNegocio cuentaNegocio = new CuentaNegocio();
+			Cuenta cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(prestamo.getCuenta().getNumero());
+			
+			
 			// Generar movimiento
-			/*Movimiento movimiento = new Movimiento();
+			Movimiento movimiento = new Movimiento();
 			movimiento.setDetalle("Suma por préstamo aprobado");
 			movimiento.setIdTipoMovimiento(new TipoMovimiento(2));
 			movimiento.setImporte(prestamo.getImportePedido());
-			movimiento.setNumeroCuenta(prestamo.getNumeroCuenta());
+			movimiento.setCuenta(cuenta);
 
 			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
-			movimientoNegocio.Agregar(movimiento); */
+			movimientoNegocio.Agregar(movimiento); 
 
 			// Generar Cuotas
 			CuotaNegocio cuotaNegocio = new CuotaNegocio();
@@ -154,34 +157,38 @@ public class ServletPrestamo extends HttpServlet {
 			dispatcher.forward(request, response);
 		}
 		if (request.getParameter("btnPagar") != null) {
-			int idPrestamo = Integer.parseInt(request.getParameter("btnPagar"));
 			int idCuota = Integer.parseInt(request.getParameter("cuota"));
 			double importe = Double.parseDouble(request.getParameter("importe"));
 			int numeroCuenta = Integer.parseInt(request.getParameter("cuenta"));
+			
+			Cuenta cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(numeroCuenta);
 
-			// Falta validar que haya fondos
 
-			// Pasa a cuota paga
-			CuotaNegocio cuotaNegocio = new CuotaNegocio();
-			boolean exitoCuota = cuotaNegocio.PagarCuota(idCuota);
-
-			// modifica el saldo
 			CuentaNegocio cuentaNegocio = new CuentaNegocio();
 			boolean exitoCuenta = cuentaNegocio.SumarSaldo(numeroCuenta, importe * (-1));
+			
 
-			/*
-			Movimiento movimiento = new Movimiento();
-			movimiento.setDetalle("Pago de cuota de Préstamo");
-			movimiento.setIdTipoMovimiento(new TipoMovimiento(3));
-			movimiento.setImporte(importe * (-1));
-			movimiento.setNumeroCuenta(numeroCuenta);
+			if (exitoCuenta) {
+				
+				CuotaNegocio cuotaNegocio = new CuotaNegocio();
+				boolean exitoCuota = cuotaNegocio.PagarCuota(idCuota);
+				if(exitoCuota) {
+					Movimiento movimiento = new Movimiento();
+					movimiento.setDetalle("Pago de cuota de Préstamo");
+					movimiento.setIdTipoMovimiento(new TipoMovimiento(3));
+					movimiento.setImporte(importe * (-1));
+					movimiento.setCuenta(cuenta);
 
-			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
-			movimientoNegocio.Agregar(movimiento);*/
-
-			if (exitoCuota) {
-				RequestDispatcher dispatcher = request.getRequestDispatcher("Inicio.jsp");
-				dispatcher.forward(request, response);
+					MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
+					movimientoNegocio.Agregar(movimiento);
+					
+					RequestDispatcher dispatcher = request.getRequestDispatcher("Inicio.jsp");
+					dispatcher.forward(request, response);
+				}			
+			}else {
+				System.out.println("no hay fondos");
+				
+				//aca hay que mopstrar alertas
 			}
 		}
 	}

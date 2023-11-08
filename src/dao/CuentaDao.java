@@ -370,7 +370,7 @@ public class CuentaDao implements ICuentaDao {
 		Cuenta cuenta = null;
 
 		try (PreparedStatement statement = conexion
-				.prepareStatement("SELECT c.*, tc.descripcion, cl.usuario, cl.dni, cl.cuil, cl.nombre, cl.apellido, "
+				.prepareStatement("SELECT c.*, tc.descripcion, cl.contraseña, cl.usuario, cl.dni, cl.cuil, cl.nombre, cl.apellido, "
 						+ "cl.sexo, cl.nacionalidad, cl.fechaNacimiento, cl.direccion, "
 						+ "loc.id, loc.nombre AS localidad, "
 						+ "prov.id, prov.nombre AS provincia, cl.correo " + "FROM cuenta c "
@@ -436,20 +436,32 @@ public class CuentaDao implements ICuentaDao {
 	}
 
 	@Override
-	public int SumarSaldo(int numeroCuenta, double saldoASumar) {
-		int resultado = 0;
+	public int SumarSaldo(int numeroCuenta, double saldoASumar) { //ya comprueba si no da salgo negativo.
+	    int filasActualizadas = 0;
 
-		try (PreparedStatement statement = conexion
-				.prepareStatement("UPDATE cuenta SET saldo = saldo + ? WHERE numero = ?")) {
-			statement.setDouble(1, saldoASumar);
-			statement.setInt(2, numeroCuenta);
+	    try (PreparedStatement statement = conexion.prepareStatement("SELECT saldo FROM cuenta WHERE numero = ?")) {
+	        statement.setInt(1, numeroCuenta);
+	        ResultSet resultSet = statement.executeQuery();
 
-			resultado = statement.executeUpdate();
-		} catch (SQLException e) {
-			System.err.println("Error al sumar saldo a la cuenta: " + e.getMessage());
-		}
+	        if (resultSet.next()) {
+	            double saldoActual = resultSet.getDouble("saldo");
+	            double nuevoSaldo = saldoActual + saldoASumar;
 
-		return resultado;
+	            // Verificar que el nuevo saldo no sea negativo
+	            if (nuevoSaldo >= 0) {
+	                try (PreparedStatement updateStatement = conexion.prepareStatement("UPDATE cuenta SET saldo = ? WHERE numero = ?")) {
+	                    updateStatement.setDouble(1, nuevoSaldo);
+	                    updateStatement.setInt(2, numeroCuenta);
+
+	                    filasActualizadas = updateStatement.executeUpdate();
+	                }
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al sumar saldo a la cuenta: " + e.getMessage());
+	    }
+
+	    return filasActualizadas;
 	}
 
 }
