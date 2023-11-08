@@ -1,3 +1,4 @@
+
 package servlets;
 
 import java.io.IOException;
@@ -74,58 +75,6 @@ public class ServletPrestamo extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
 			dispatcher.forward(request, response);
 		}
-		// BUSCAR (ESTO NO VALE LA PENA
-		/*if (request.getParameter("btnBusquedaCliente") != null) {
-			HttpSession session = request.getSession();
-			Cliente cliente = (Cliente) session.getAttribute("cliente");
-			int idCliente = cliente.getIdCliente();
-			
-			String busqueda = request.getParameter("busqueda");
-			
-			CuotaNegocio cuotaNegocio = new CuotaNegocio();
-			ArrayList<Cuota> listaCuotas = cuotaNegocio.ListarPorClienteAprobadoEImpago(idCliente);
-
-			request.setAttribute("listaCuotas", listaCuotas);
-
-			CuentaNegocio cuentaNegocio = new CuentaNegocio();
-			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, busqueda);
-
-			request.setAttribute("listaCuentas", listaCuentas);
-
-			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
-			dispatcher.forward(request, response);
-		}
-		// FILTRAR
-		if (request.getParameter("btnFiltrarCliente") != null) {
-			HttpSession session = request.getSession();
-			Cliente cliente = (Cliente) session.getAttribute("cliente");
-			int idCliente = cliente.getIdCliente();
-			
-			String tipoFiltro = request.getParameter("operadorSaldo");
-			String saldoFiltroStr = request.getParameter("saldoFiltro");
-			double saldoFiltro = (saldoFiltroStr != null && !saldoFiltroStr.isEmpty())
-					? Double.parseDouble(saldoFiltroStr)
-					: 0.0;
-			String busqueda = request.getParameter("busqueda");
-
-			CuotaNegocio cuotaNegocio = new CuotaNegocio();
-			ArrayList<Cuota> listaCuotas = cuotaNegocio.ListarPorClienteAprobadoEImpago(idCliente);
-
-			request.setAttribute("listaCuotas", listaCuotas);
-
-			CuentaNegocio cuentaNegocio = new CuentaNegocio();
-			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, busqueda);
-
-			request.setAttribute("listaCuentas", listaCuentas);
-
-
-			request.setAttribute("operadorSaldo", tipoFiltro);
-			request.setAttribute("busqueda", busqueda);
-			request.setAttribute("saldoFiltro", saldoFiltro);
-
-			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
-			dispatcher.forward(request, response);
-		}*/
 
 		/////////////////////////////////////
 		// ADMIN ----------------------------------------
@@ -221,6 +170,8 @@ public class ServletPrestamo extends HttpServlet {
 			movimiento.setIdTipoMovimiento(new TipoMovimiento(2));
 			movimiento.setImporte(prestamo.getImportePedido());
 			movimiento.setCuenta(cuenta);
+
+			cuentaNegocio.SumarSaldo(cuenta.getNumero(), prestamo.getImportePedido());
 
 			MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
 			movimientoNegocio.Agregar(movimiento);

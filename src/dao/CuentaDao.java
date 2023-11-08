@@ -52,73 +52,74 @@ public class CuentaDao implements ICuentaDao {
 	}
 
 	public Cuenta ObtenerPorNumeroCuenta(int numeroCuenta) {
-		Cuenta cuenta = null;
+	    Cuenta cuenta = null;
 
-		try (PreparedStatement statement = conexion.prepareStatement("SELECT c.*, tc.descripcion, "
-				+ "cl.idCliente, cl.usuario, cl.contraseña, cl.activo, cl.fechaCreacion, cl.idTipo AS tipoCliente, "
-				+ "cl.dni, cl.cuil, cl.nombre, cl.apellido, cl.sexo AS sexoCliente, "
-				+ "cl.nacionalidad, cl.fechaNacimiento, cl.direccion, "
-				+ "loc.id AS idLocalidad, loc.Nombre AS nombreLocalidad, "
-				+ "prov.id AS idProvincia, prov.Nombre AS nombreProvincia, " + "cl.correo " + "FROM cuenta c "
-				+ "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta "
-				+ "INNER JOIN cliente cl ON c.idCliente = cl.idCliente "
-				+ "INNER JOIN localidades loc ON cl.idLocalidad = loc.id "
-				+ "INNER JOIN provincias prov ON cl.idProvincia = prov.id " + "WHERE c.numero = ? AND c.activo = 1")) {
-			statement.setInt(1, numeroCuenta);
+	    try (PreparedStatement statement = conexion.prepareStatement("SELECT c.*, tc.descripcion, " +
+	            "cl.*, " +
+	            "loc.id AS idLocalidad, loc.Nombre AS nombreLocalidad, " +
+	            "prov.id AS idProvincia, prov.Nombre AS nombreProvincia " +
+	            "FROM cuenta c " +
+	            "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta " +
+	            "INNER JOIN cliente cl ON c.idCliente = cl.idCliente " +
+	            "INNER JOIN localidades loc ON cl.idLocalidad = loc.id " +
+	            "INNER JOIN provincias prov ON cl.idProvincia = prov.id " +
+	            "WHERE c.numero = ? AND c.activo = 1")) {
+	        statement.setInt(1, numeroCuenta);
 
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (resultSet.next()) {
-					cuenta = new Cuenta();
-					cuenta.setNumero(resultSet.getInt("numero"));
-					cuenta.setCBU(resultSet.getString("CBU"));
-					cuenta.setSaldo(resultSet.getDouble("saldo"));
-					cuenta.setFecha(resultSet.getDate("fecha").toLocalDate());
-					cuenta.setActivo(resultSet.getInt("activo"));
+	        try (ResultSet resultSet = statement.executeQuery()) {
+	            if (resultSet.next()) {
+	                cuenta = new Cuenta();
+	                cuenta.setNumero(resultSet.getInt("numero"));
+	                cuenta.setCBU(resultSet.getString("CBU"));
+	                cuenta.setSaldo(resultSet.getDouble("saldo"));
+	                cuenta.setFecha(resultSet.getDate("fecha").toLocalDate());
+	                cuenta.setActivo(resultSet.getInt("activo"));
 
-					TipoCuenta tipoCuenta = new TipoCuenta();
-					tipoCuenta.setIdTipoCuenta(resultSet.getInt("idTipoCuenta"));
-					tipoCuenta.setDescripcion(resultSet.getString("descripcion"));
+	                TipoCuenta tipoCuenta = new TipoCuenta();
+	                tipoCuenta.setIdTipoCuenta(resultSet.getInt("idTipoCuenta"));
+	                tipoCuenta.setDescripcion(resultSet.getString("descripcion"));
 
-					cuenta.setTipoCuenta(tipoCuenta);
+	                cuenta.setTipoCuenta(tipoCuenta);
 
-					Cliente cliente = new Cliente();
-					cliente.setIdCliente(resultSet.getInt("idCliente"));
-					cliente.setUsuario(resultSet.getString("usuario"));
-					cliente.setContrasena(resultSet.getString("contraseña"));
-					cliente.setActivo(resultSet.getInt("activo"));
-					cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
-					cliente.setTipoCliente(resultSet.getInt("tipoCliente"));
-					cliente.setDni(resultSet.getInt("dni"));
-					cliente.setCuil(resultSet.getString("cuil"));
-					cliente.setNombre(resultSet.getString("nombre"));
-					cliente.setApellido(resultSet.getString("apellido"));
-					cliente.setSexo(resultSet.getInt("sexoCliente"));
-					cliente.setNacionalidad(resultSet.getString("nacionalidad"));
-					cliente.setFechaNacimiento(resultSet.getDate("fechaNacimiento").toLocalDate());
-					cliente.setDireccion(resultSet.getString("direccion"));
+	                Cliente cliente = new Cliente();
+	                cliente.setIdCliente(resultSet.getInt("idCliente"));
+	                cliente.setUsuario(resultSet.getString("usuario"));
+	                cliente.setContrasena(resultSet.getString("contraseña"));
+	                cliente.setActivo(resultSet.getInt("activo"));
+	                cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
+	                cliente.setTipoCliente(resultSet.getInt("idTipo")); // Obtener el tipo de cliente de la columna idTipo
+	                cliente.setDni(resultSet.getInt("dni"));
+	                cliente.setCuil(resultSet.getString("cuil"));
+	                cliente.setNombre(resultSet.getString("nombre"));
+	                cliente.setApellido(resultSet.getString("apellido"));
+	                cliente.setSexo(resultSet.getInt("sexo"));
+	                cliente.setNacionalidad(resultSet.getString("nacionalidad"));
+	                cliente.setFechaNacimiento(resultSet.getDate("fechaNacimiento").toLocalDate());
+	                cliente.setDireccion(resultSet.getString("direccion"));
 
-					Localidad localidad = new Localidad();
-					localidad.setId(resultSet.getInt("idLocalidad"));
-					localidad.setIdProvincia(resultSet.getInt("idProvincia"));
-					localidad.setNombre(resultSet.getString("nombreLocalidad"));
+	                Localidad localidad = new Localidad();
+	                localidad.setId(resultSet.getInt("idLocalidad"));
+	                localidad.setIdProvincia(resultSet.getInt("idProvincia"));
+	                localidad.setNombre(resultSet.getString("nombreLocalidad"));
 
-					Provincia provincia = new Provincia();
-					provincia.setId(resultSet.getInt("idProvincia"));
-					provincia.setNombre(resultSet.getString("nombreProvincia"));
+	                Provincia provincia = new Provincia();
+	                provincia.setId(resultSet.getInt("idProvincia"));
+	                provincia.setNombre(resultSet.getString("nombreProvincia"));
 
-					cliente.setLocalidad(localidad);
-					cliente.setProvincia(provincia);
-					cliente.setCorreo(resultSet.getString("correo"));
+	                cliente.setLocalidad(localidad);
+	                cliente.setProvincia(provincia);
+	                cliente.setCorreo(resultSet.getString("correo"));
 
-					cuenta.setCliente(cliente);
-				}
-			}
-		} catch (SQLException e) {
-			System.err.println("Error al obtener la cuenta por número de cuenta: " + e.getMessage());
-		}
+	                cuenta.setCliente(cliente);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al obtener la cuenta por número de cuenta: " + e.getMessage());
+	    }
 
-		return cuenta;
+	    return cuenta;
 	}
+
 
 	@Override
 	public ArrayList<Cuenta> ListarCuentasActivas(String busqueda) {
@@ -170,7 +171,7 @@ public class CuentaDao implements ICuentaDao {
 					cliente.setContrasena(resultSet.getString("contraseña"));
 					cliente.setActivo(resultSet.getInt("activo"));
 					cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
-					cliente.setTipoCliente(resultSet.getInt("tipoCliente"));
+					cliente.setTipoCliente(resultSet.getInt("idTipo"));
 					cliente.setDni(resultSet.getInt("dni"));
 					cliente.setCuil(resultSet.getString("cuil"));
 					cliente.setNombre(resultSet.getString("nombre"));
@@ -231,7 +232,6 @@ public class CuentaDao implements ICuentaDao {
 				statement.setString(4, busqueda);
 				statement.setString(5, "%" + busqueda + "%");
 			}
-			
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
@@ -379,71 +379,73 @@ public class CuentaDao implements ICuentaDao {
 
 	@Override
 	public Cuenta ObtenerPorCbu(String cbu) {
-		Cuenta cuenta = null;
+	    Cuenta cuenta = null;
 
-		try (PreparedStatement statement = conexion.prepareStatement(
-				"SELECT c.*, tc.descripcion, cl.contraseña, cl.usuario, cl.dni, cl.cuil, cl.nombre, cl.apellido, "
-						+ "cl.sexo, cl.nacionalidad, cl.fechaNacimiento, cl.direccion, "
-						+ "loc.id, loc.nombre AS localidad, " + "prov.id, prov.nombre AS provincia, cl.correo "
-						+ "FROM cuenta c " + "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta "
-						+ "INNER JOIN cliente cl ON c.idCliente = cl.idCliente "
-						+ "INNER JOIN localidades loc ON cl.idLocalidad = loc.id "
-						+ "INNER JOIN provincias prov ON cl.idProvincia = prov.id "
-						+ "WHERE c.CBU = ? AND c.activo = 1")) {
-			statement.setString(1, cbu);
+	    try (PreparedStatement statement = conexion.prepareStatement(
+	            "SELECT c.*, tc.*, cl.contraseña, cl.usuario, cl.dni, cl.cuil, cl.nombre, cl.apellido, " +
+	            "cl.sexo AS sexoCliente, cl.nacionalidad, cl.fechaNacimiento, cl.direccion, " +
+	            "loc.id AS idLocalidad, loc.nombre AS localidad, " +
+	            "prov.id AS idProvincia, prov.nombre AS provincia, cl.correo " +
+	            "FROM cuenta c " +
+	            "INNER JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta " +
+	            "INNER JOIN cliente cl ON c.idCliente = cl.idCliente " +
+	            "INNER JOIN localidades loc ON cl.idLocalidad = loc.id " +
+	            "INNER JOIN provincias prov ON cl.idProvincia = prov.id " +
+	            "WHERE c.CBU = ? AND c.activo = 1")) {
+	        statement.setString(1, cbu);
 
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (resultSet.next()) {
-					cuenta = new Cuenta();
-					cuenta.setNumero(resultSet.getInt("numero"));
-					cuenta.setCBU(resultSet.getString("CBU"));
-					cuenta.setSaldo(resultSet.getDouble("saldo"));
-					cuenta.setFecha(resultSet.getDate("fecha").toLocalDate());
-					cuenta.setActivo(resultSet.getInt("activo"));
+	        try (ResultSet resultSet = statement.executeQuery()) {
+	            if (resultSet.next()) {
+	                cuenta = new Cuenta();
+	                cuenta.setNumero(resultSet.getInt("numero"));
+	                cuenta.setCBU(resultSet.getString("CBU"));
+	                cuenta.setSaldo(resultSet.getDouble("saldo"));
+	                cuenta.setFecha(resultSet.getDate("fecha").toLocalDate());
+	                cuenta.setActivo(resultSet.getInt("activo"));
 
-					TipoCuenta tipoCuenta = new TipoCuenta();
-					tipoCuenta.setIdTipoCuenta(resultSet.getInt("idTipoCuenta"));
-					tipoCuenta.setDescripcion(resultSet.getString("descripcion"));
+	                TipoCuenta tipoCuenta = new TipoCuenta();
+	                tipoCuenta.setIdTipoCuenta(resultSet.getInt("tc.idTipoCuenta"));
+	                tipoCuenta.setDescripcion(resultSet.getString("tc.descripcion"));
 
-					cuenta.setTipoCuenta(tipoCuenta);
+	                cuenta.setTipoCuenta(tipoCuenta);
 
-					Cliente cliente = new Cliente();
-					cliente.setIdCliente(resultSet.getInt("idCliente"));
-					cliente.setUsuario(resultSet.getString("usuario"));
-					cliente.setContrasena(resultSet.getString("contraseña"));
-					cliente.setActivo(resultSet.getInt("activo"));
-					cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
-					cliente.setTipoCliente(resultSet.getInt("tipoCliente"));
-					cliente.setDni(resultSet.getInt("dni"));
-					cliente.setCuil(resultSet.getString("cuil"));
-					cliente.setNombre(resultSet.getString("nombre"));
-					cliente.setApellido(resultSet.getString("apellido"));
-					cliente.setSexo(resultSet.getInt("sexoCliente"));
-					cliente.setNacionalidad(resultSet.getString("nacionalidad"));
-					cliente.setFechaNacimiento(resultSet.getDate("fechaNacimiento").toLocalDate());
-					cliente.setDireccion(resultSet.getString("direccion"));
+	                Cliente cliente = new Cliente();
+	                cliente.setIdCliente(resultSet.getInt("idCliente"));
+	                cliente.setUsuario(resultSet.getString("usuario"));
+	                cliente.setContrasena(resultSet.getString("contraseña"));
+	                cliente.setActivo(resultSet.getInt("activo"));
+	                cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
+	                cliente.setTipoCliente(resultSet.getInt("idTipo")); // Obtener el tipo de cliente de la columna idTipo
+	                cliente.setDni(resultSet.getInt("dni"));
+	                cliente.setCuil(resultSet.getString("cuil"));
+	                cliente.setNombre(resultSet.getString("nombre"));
+	                cliente.setApellido(resultSet.getString("apellido"));
+	                cliente.setSexo(resultSet.getInt("sexoCliente"));
+	                cliente.setNacionalidad(resultSet.getString("nacionalidad"));
+	                cliente.setFechaNacimiento(resultSet.getDate("fechaNacimiento").toLocalDate());
+	                cliente.setDireccion(resultSet.getString("direccion"));
 
-					Localidad localidad = new Localidad();
-					localidad.setId(resultSet.getInt("loc.id"));
-					localidad.setIdProvincia(resultSet.getInt("prov.id"));
-					localidad.setNombre(resultSet.getString("nombreLocalidad"));
+	                Localidad localidad = new Localidad();
+	                localidad.setId(resultSet.getInt("idLocalidad"));
+	                localidad.setIdProvincia(resultSet.getInt("idProvincia"));
+	                localidad.setNombre(resultSet.getString("localidad"));
 
-					Provincia provincia = new Provincia();
-					provincia.setId(resultSet.getInt("prov.id"));
-					provincia.setNombre(resultSet.getString("nombreProvincia"));
+	                Provincia provincia = new Provincia();
+	                provincia.setId(resultSet.getInt("idProvincia"));
+	                provincia.setNombre(resultSet.getString("provincia"));
 
-					cliente.setLocalidad(localidad);
-					cliente.setProvincia(provincia);
-					cliente.setCorreo(resultSet.getString("correo"));
+	                cliente.setLocalidad(localidad);
+	                cliente.setProvincia(provincia);
+	                cliente.setCorreo(resultSet.getString("correo"));
 
-					cuenta.setCliente(cliente);
-				}
-			}
-		} catch (SQLException e) {
-			System.err.println("Error al obtener la cuenta por CBU: " + e.getMessage());
-		}
+	                cuenta.setCliente(cliente);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al obtener la cuenta por CBU: " + e.getMessage());
+	    }
 
-		return cuenta;
+	    return cuenta;
 	}
 
 	@Override

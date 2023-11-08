@@ -6,6 +6,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+<%
+	Cliente clienteUsuario = (Cliente) session.getAttribute("cliente");
+
+	if (clienteUsuario == null || clienteUsuario.getTipoCliente() != Cliente.TipoCliente.ADMIN) {
+		response.sendRedirect("ErrorPermiso.jsp");
+	}
+%>
 <meta charset="UTF-8">
 <link rel="stylesheet"
 	href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">

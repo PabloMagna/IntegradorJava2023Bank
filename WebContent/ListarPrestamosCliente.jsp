@@ -8,6 +8,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+<%
+	Cliente clienteUsuario = (Cliente) session.getAttribute("cliente");
+
+	if (clienteUsuario == null || clienteUsuario.getTipoCliente() == Cliente.TipoCliente.ADMIN) {
+		response.sendRedirect("ErrorPermiso.jsp");
+	}
+%>
 <meta charset="UTF-8">
 <title>Lista de Préstamos</title>
 <link rel="stylesheet"

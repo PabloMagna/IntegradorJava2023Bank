@@ -6,6 +6,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+<%
+	Cliente clienteUsuario = (Cliente) session.getAttribute("cliente");
+
+	if (clienteUsuario == null || clienteUsuario.getTipoCliente() == Cliente.TipoCliente.ADMIN) {
+		response.sendRedirect("ErrorPermiso.jsp");
+	}
+%>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Listado de Cuentas del Cliente</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -31,14 +38,14 @@
 	}
 	$(document).ready(function() {
 		$('#cuentasTable').DataTable({
-			"paging" : true, 
-			"lengthMenu" : [ 5, 10, 25, 50, 100 ], 
-			"pageLength" : 10, 
+			"paging" : true,
+			"lengthMenu" : [ 5, 10, 25, 50, 100 ],
+			"pageLength" : 10,
 			"searching" : false,
 			"ordering" : true,
-			"language": {
-	            "emptyTable": "El cliente no posee cuentas activas"
-	        }
+			"language" : {
+				"emptyTable" : "El cliente no posee cuentas activas"
+			}
 		});
 	});
 </script>

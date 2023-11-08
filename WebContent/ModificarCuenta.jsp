@@ -7,6 +7,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+<%
+	Cliente clienteUsuario = (Cliente) session.getAttribute("cliente");
+
+	if (clienteUsuario == null || clienteUsuario.getTipoCliente() != Cliente.TipoCliente.ADMIN) {
+		response.sendRedirect("ErrorPermiso.jsp");
+	}
+%>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Formulario para Modificar una Cuenta</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -32,7 +39,8 @@
 			<div class="mb-3">
 				<label for="idCliente" class="form-label">ID del Cliente:</label> <input
 					type="text" name="idCliente" id="idCliente"
-					value="<%=cuenta.getCliente().getIdCliente() %>" class="form-control" readonly>
+					value="<%=cuenta.getCliente().getIdCliente()%>"
+					class="form-control" readonly>
 			</div>
 
 			<div class="mb-3">
