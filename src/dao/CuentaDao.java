@@ -171,7 +171,7 @@ public class CuentaDao implements ICuentaDao {
 					cliente.setContrasena(resultSet.getString("contraseña"));
 					cliente.setActivo(resultSet.getInt("activo"));
 					cliente.setFechaCreacion(resultSet.getDate("fechaCreacion").toLocalDate());
-					cliente.setTipoCliente(resultSet.getInt("idTipo"));
+					cliente.setTipoCliente(resultSet.getInt("tipoCliente"));
 					cliente.setDni(resultSet.getInt("dni"));
 					cliente.setCuil(resultSet.getString("cuil"));
 					cliente.setNombre(resultSet.getString("nombre"));

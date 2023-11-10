@@ -24,9 +24,6 @@ import negocio.CuotaNegocio;
 import negocio.MovimientoNegocio;
 import negocio.PrestamoNegocio;
 
-/**
- * Servlet implementation class ServletPrestamo
- */
 @WebServlet("/ServletPrestamo")
 public class ServletPrestamo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
