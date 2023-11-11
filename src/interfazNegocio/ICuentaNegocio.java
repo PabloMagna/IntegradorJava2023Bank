@@ -14,4 +14,5 @@ public interface ICuentaNegocio {
 	public Cuenta ObtenerPorNumeroCuenta(int numero);
 	public Cuenta ObtenerPorCbu(String cbu);
 	public boolean SumarSaldo(int numeroCuenta, double saldo);
+	public int CantidadCuentasEstadisticaUno(int anio, int mes);
 }

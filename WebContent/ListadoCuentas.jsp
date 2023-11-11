@@ -21,6 +21,7 @@
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     function limpiarCampos() {
@@ -31,6 +32,38 @@
         document.querySelector('[name="btnBusqueda"]').click();
     }
 </script>
+<script>
+    function confirmarEliminacion(idCuenta) {
+        Swal.fire({
+            title: '¿Seguro que deseas eliminar esta cuenta?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "ServletCuenta?EliminarNumeroCuenta=" + idCuenta;
+            }
+        });
+    }
+</script>
+
+
+<script>
+        $(document).ready(function() {
+            $('#cuentasTable').DataTable({
+                "paging": true,
+                "lengthMenu": [5, 10, 25, 50, 100],
+                "pageLength": 10,
+                "searching": true,
+                "ordering": true,
+                "searching": false
+            });
+        });     
+			
+    </script>
 <title>Listado de Cuentas</title>
 </head>
 <body>
@@ -78,19 +111,30 @@
 		if (request.getAttribute("exitoModificacion") != null
 				&& (boolean) request.getAttribute("exitoModificacion")) {
 	%>
-	<div class="alert alert-success" role="alert">Modificado con
-		éxito.</div>
+	<script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Modificado con éxito.',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    </script>
 	<%
 		}
 	%>
-
 
 	<%
 		if (request.getAttribute("exitoEliminacion") != null
 				&& (boolean) request.getAttribute("exitoEliminacion")) {
 	%>
-	<div class="alert alert-success">La cuenta se eliminó
-		correctamente.</div>
+	<script>
+        Swal.fire({
+            icon: 'success',
+            title: 'La cuenta se eliminó correctamente.',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    </script>
 	<%
 		}
 	%>
@@ -99,10 +143,18 @@
 		if (request.getAttribute("exitoEliminacion") != null
 				&& !(boolean) request.getAttribute("exitoEliminacion")) {
 	%>
-	<div class="alert alert-danger">No se pudo eliminar la cuenta.</div>
+	<script>
+        Swal.fire({
+            icon: 'error',
+            title: 'No se pudo eliminar la cuenta.',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    </script>
 	<%
 		}
 	%>
+
 
 	<%
 		ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) request.getAttribute("listaCuentas");
@@ -160,34 +212,5 @@
 	<%
 		}
 	%>
-
-	<script>
-        function confirmarEliminacion(idCuenta) {
-            const confirmacion = confirm("¿Seguro que deseas eliminar esta cuenta?");
-            if (confirmacion) {
-                window.location.href = "ServletCuenta?EliminarNumeroCuenta=" + idCuenta;
-            }
-        }
-
-        $(document).ready(function() {
-            $('#cuentasTable').DataTable({
-                "paging": true,
-                "lengthMenu": [5, 10, 25, 50, 100],
-                "pageLength": 10,
-                "searching": true,
-                "ordering": true,
-                "searching": false
-            });
-        });     
-        <%if (request.getAttribute("exitoEliminacion") != null) {
-				boolean exitoEliminacion = (boolean) request.getAttribute("exitoEliminacion");
-				if (exitoEliminacion) {%>        
-        alert("La cuenta se eliminó correctamente.");
-        <%} else {%>        
-        alert("No se pudo eliminar la cuenta.");
-        <%}
-			}%>
-			
-    </script>
 </body>
 </html>

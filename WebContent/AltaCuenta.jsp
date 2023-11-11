@@ -27,6 +27,7 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <title>Formulario para Cargar una Cuenta</title>
 <style>
 /* Estilo personalizado para centrar el contenido vertical y horizontalmente */
@@ -44,19 +45,26 @@
 			<h1>Formulario para Cargar una Cuenta</h1>
 
 			<!-- Verificar si hay una advertencia -->
+
 			<%
 				String advertencia = (String) request.getAttribute("advertencia");
 				if (advertencia != null) {
 			%>
-			<div
-				class="alert alert-<%=advertencia.equals("exito") ? "success" : "danger"%>">
-				<strong><%=advertencia.equals("exito") ? "Éxito" : "Error"%>!</strong>
-				<%=(advertencia.equals("exito") ? "La cuenta se ha agregado exitosamente."
-						: "El cliente ya posee 3 cuentas.")%>
-			</div>
+			<script>
+        Swal.fire({
+            icon: "<%=advertencia.equals("exito") ? "success" : "error"%>",
+            title: "<%=advertencia.equals("exito") ? "Éxito" : "Error"%>",
+            text:"<%=advertencia.equals("exito")
+						? "La cuenta se ha agregado exitosamente."
+						: "El cliente ya posee 3 cuentas."%>",
+            showConfirmButton: false,
+            timer: 3000
+        });
+    </script>
 			<%
 				}
 			%>
+
 
 			<form action="ServletCuenta" method="post">
 				<div class="form-group">

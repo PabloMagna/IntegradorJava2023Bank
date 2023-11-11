@@ -36,22 +36,32 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <title>Transferencia</title>
 </head>
 <body>
 	<div class="container">
 		<h1 class="mt-4">Realizar Transferencia</h1>
 
-		<%-- Mostrar mensaje de error si existe --%>
-		<div class="alert alert-danger mt-3">
-			<%
-				if (errorMensaje != null) {
-			%>
-			<%=errorMensaje%>
-			<%
-				}
-			%>
-		</div>
+		<%
+			if (errorMensaje != null) {
+				String iconType = (errorMensaje.equals("Transferencia exitosa.")) ? "success" : "error";
+		%>
+		<script>
+        Swal.fire({
+            icon: "<%=iconType%>",
+            title: "Mensaje",
+            text: "<%=errorMensaje%>",
+				showConfirmButton : false,
+				timer : 3000
+			});
+		</script>
+		<%
+			}
+		%>
+
+
+
 
 		<form action="ServletCuenta" method="post" class="mt-4">
 			<div class="form-group">
@@ -65,8 +75,8 @@
 			</div>
 			<div class="form-group">
 				<label for="origen">Cuenta de Origen:</label> <input type="text"
-					class="form-control" value="<%=cuentaOrigen.getNumero()%>"
-					readonly> <input type="hidden" name="cuentaOrigen"
+					class="form-control" value="<%=cuentaOrigen.getNumero()%>" readonly>
+				<input type="hidden" name="cuentaOrigen"
 					value="<%=cuentaOrigen.getNumero()%>">
 			</div>
 			<button type="submit" name="btnTransferir" class="btn btn-primary">Realizar

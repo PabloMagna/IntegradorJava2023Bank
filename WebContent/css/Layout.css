@@ -17,9 +17,8 @@ body{
 		.ul-layout li{
   			background-color: black;
 		  	color: white; 
-		  	padding: 5px; 
-		  	margin: 0 15px;	
-		  	padding: 5px 0;	  			  	
+		  	padding: 5px 0; 
+		  	margin: 0 15px;			  	  			  	
 		}
 		.ul-layout a{
 			text-decoration: none;
@@ -43,6 +42,41 @@ body{
 		}
 	
 		#exit{
-			background-color: #828282;
+			background-color: #58D3F7;
 			border: 1px solid #828282;
+			text-decoration: none;
+		}
+		
+		#exitIcon{
+			font-size: 20px;
+			color: #828282;
+		}
+		
+		#tituloReporte{
+			padding: 15px 0 0 0;
+			text-align: center;
+		}
+		#descripcionReporte{
+			margin-bottom: 10px;;
+			text-align: center;
+			color: #555;
+			font-weight: lighter;			
+		}
+		
+		#cuadroReporte{
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			
+		}
+		
+		#grillaReporte{
+			width: 100%;
+	      	margin: auto;
+	      	background-color: #58D3F7;
+	      	border-radius: 0.4rem;
+		}
+		
+		#divAnioAnterior, #divAnioActual{
+			margin:10px 0;
 		}

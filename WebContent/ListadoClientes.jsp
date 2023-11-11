@@ -23,7 +23,7 @@
 <link rel="stylesheet"
 	href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#clientesTable').DataTable();
@@ -99,8 +99,17 @@
 		if (request.getAttribute("exitoModificacion") != null
 				&& (boolean) request.getAttribute("exitoModificacion")) {
 	%>
-	<div class="alert alert-success" role="alert">Modificado con
-		éxito.</div>
+	<!-- Antes: Mostrar mensaje de éxito utilizando Bootstrap -->
+	<!--<div class="alert alert-success" role="alert">Modificado con éxito.</div>-->
+	<script>
+        // Nuevo: Reemplazar con SweetAlert
+        Swal.fire({
+            icon: "success",
+            title: "Modificado con éxito",
+            showConfirmButton: false,
+            timer: 2500
+        });
+    </script>
 	<%
 		}
 	%>
@@ -109,10 +118,21 @@
 		if (request.getAttribute("exitoEliminacionCliente") != null
 				&& (boolean) request.getAttribute("exitoEliminacionCliente")) {
 	%>
-	<div class="alert alert-success">Cliente eliminado correctamente.</div>
+	<!-- Antes: Mostrar mensaje de éxito utilizando Bootstrap -->
+	<!--<div class="alert alert-success">Cliente eliminado correctamente.</div>-->
+	<script>
+        // Nuevo: Reemplazar con SweetAlert
+        Swal.fire({
+            icon: "success",
+            title: "Cliente eliminado correctamente",
+            showConfirmButton: false,
+            timer: 2500
+        });
+    </script>
 	<%
 		}
 	%>
+
 
 
 	<%
@@ -217,13 +237,23 @@
 	%>
 	<script>
 		function confirmarEliminacionCliente(idCliente) {
-			const confirmacion = confirm("¿Seguro que deseas eliminar a este cliente?");
-			if (confirmacion) {
-				window.location.href = "ServletCliente?ElimId=" + idCliente;
-			} else {
-				// No hacer nada o redirigir a alguna otra página, si es necesario
-			}
-		}
+			//const confirmacion = confirm("¿Seguro que deseas eliminar a este cliente?");
+			//if (confirmacion) {
+				//window.location.href = "ServletCliente?ElimId=" + idCliente;
+				Swal.fire({
+		            title: '¿Seguro que deseas eliminar a este cliente?',
+		            icon: 'warning',
+		            showCancelButton: true,
+		            confirmButtonText: 'Sí, eliminar',
+		            cancelButtonText: 'Cancelar'
+		        }).then((result) => {
+		            if (result.isConfirmed) {
+		                // Si el usuario hace clic en "Sí, eliminar", realiza la eliminación
+		                window.location.href = "ServletCliente?ElimId=" + idCliente;
+		            }
+		        });
+			} 
+		//}
 	</script>
 </body>
 </html>

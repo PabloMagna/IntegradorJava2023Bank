@@ -382,8 +382,7 @@ public class CuentaDao implements ICuentaDao {
 	    Cuenta cuenta = null;
 
 	    try (PreparedStatement statement = conexion.prepareStatement(
-	            "SELECT c.*, tc.*, cl.contraseña, cl.usuario, cl.dni, cl.cuil, cl.nombre, cl.apellido, " +
-	            "cl.sexo AS sexoCliente, cl.nacionalidad, cl.fechaNacimiento, cl.direccion, " +
+	            "SELECT c.*, tc.*, cl.*, " +
 	            "loc.id AS idLocalidad, loc.nombre AS localidad, " +
 	            "prov.id AS idProvincia, prov.nombre AS provincia, cl.correo " +
 	            "FROM cuenta c " +
@@ -420,7 +419,7 @@ public class CuentaDao implements ICuentaDao {
 	                cliente.setCuil(resultSet.getString("cuil"));
 	                cliente.setNombre(resultSet.getString("nombre"));
 	                cliente.setApellido(resultSet.getString("apellido"));
-	                cliente.setSexo(resultSet.getInt("sexoCliente"));
+	                cliente.setSexo(resultSet.getInt("sexo"));
 	                cliente.setNacionalidad(resultSet.getString("nacionalidad"));
 	                cliente.setFechaNacimiento(resultSet.getDate("fechaNacimiento").toLocalDate());
 	                cliente.setDireccion(resultSet.getString("direccion"));
@@ -477,5 +476,24 @@ public class CuentaDao implements ICuentaDao {
 
 		return filasActualizadas;
 	}
+	@Override
+	public int CantidadCuentasEstadisticaUno(int anio, int mes) {
+		int cantidadCuentas = 0;
 
+		try (PreparedStatement statement = conexion
+				.prepareStatement("SELECT COUNT(*) AS cantidad FROM cuenta WHERE DATEPART(YEAR, fecha) = ? AND DATEPART(MONTH, fecha) = ?")) {
+			statement.setInt(1, anio);
+			statement.setInt(2, mes);
+			
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (resultSet.next()) {
+					cantidadCuentas = resultSet.getInt("cantidad");
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Error al obtener la cantidad de cuentas del período indicado: " + e.getMessage());
+		}
+
+		return cantidadCuentas;
+	}
 }

@@ -95,5 +95,9 @@ public class CuentaNegocio implements ICuentaNegocio {
 
 	    return listaFiltrada;
 	}
+	@Override
+	public int CantidadCuentasEstadisticaUno(int anio, int mes) {
+		return dao.CantidadCuentasEstadisticaUno(anio, mes);
+	}
 
 }

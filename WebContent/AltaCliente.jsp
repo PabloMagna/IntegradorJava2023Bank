@@ -30,6 +30,7 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 .scrollable-list {
 	max-height: 100px;
@@ -127,8 +128,14 @@ function agregarTelefono() {
     // Verificar que el número de teléfono contenga solo dígitos y, si está presente, un solo signo "+" al comienzo
     var telefonoValido = /^[+]?\d+$/;
     if (!telefonoValido.test(nuevoTelefono)) {
-        alert("El número de teléfono debe contener solo dígitos y, si está presente, un signo + al comienzo.");
-        return;
+       // alert("El número de teléfono debe contener solo dígitos y, si está presente, un signo + al comienzo.");
+       
+      Swal.fire({
+  icon: "error",
+  title: "Oops...",
+  text: "El número de teléfono debe contener solo dígitos y, si está presente, un signo + al comienzo."
+});
+       return; 
     }
 
     var telefonosList = $("#telefonosList");
@@ -150,9 +157,15 @@ function agregarTelefono() {
     listItem.append(deleteButton);
     telefonosList.append(listItem);
     $("#nuevoTelefono").val("");
-
     // Mostrar un mensaje de éxito
-    alert("Teléfono ingresado con éxito.");
+   // alert("Teléfono ingresado con éxito.");
+    Swal.fire({
+    	  position: "top-end",
+    	  icon: "success",
+    	  title: "Teléfono ingresado con éxito!",
+    	  showConfirmButton: false,
+    	  timer: 1500
+    	});
 }
 
 
@@ -160,7 +173,17 @@ function agregarTelefono() {
 function eliminarTelefono(button) {
     var telefono = $(button).prev().val(); // Obtener el valor del teléfono que se eliminará
     $(button).parent().remove();
-    alert("Teléfono eliminado: " + telefono); // Mostrar una alerta pop-up con el mensaje
+    //alert("Teléfono eliminado: " + telefono); // Mostrar una alerta pop-up con el mensaje
+    Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Teléfono Eliminado Correctamente",
+        showConfirmButton: false,
+        timer: 2500,
+        customClass: {
+            icon: 'swal2-trash', // Agregar una clase personalizada para el icono
+        },
+    });
 }
 function validarCampos() {
     var elementos = document.getElementsByTagName("input");
@@ -223,7 +246,15 @@ function validarCampos() {
 
 //Verificar la presencia del parámetro "exito" en la URL y mostrar un mensaje de éxito si está presente
 <%if (request.getParameter("exito") != null && request.getParameter("exito").equals("true")) {%>
-alert("Cliente agregado exitosamente.");
+// alert("Cliente agregado exitosamente.");
+Swal.fire({
+  position: "top",
+  icon: "success",
+  title: "Cliente Agregado Exitosamente",
+  showConfirmButton: false,
+  timer: 2500
+});
+
 // Restablecer los valores de los campos
 document.getElementById("usuario").value = "";
 document.getElementById("contrasena").value = "";
@@ -246,14 +277,27 @@ document.getElementById("nuevoTelefono").value = ""; // Limpia el campo de nuevo
 <%if (request.getParameter("exito") != null && request.getParameter("exito").equals("true")) {%>
 $(function() {
     // Muestra el mensaje de éxito
-    $("#mensajeExito").show();
+    //$("#mensajeExito").show();
+	Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Operación Exitosa",
+        showConfirmButton: false,
+        timer: 2500
+    });    
 });
 <%}%>
 
 <%if (request.getAttribute("advertencia") != null) {%>
 $(function() {
     // Mostrar el mensaje de advertencia utilizando JavaScript y Bootstrap
-    $("#mensajeAdvertencia").show();
+    //("#mensajeAdvertencia").show();
+	Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "<%= request.getAttribute("advertencia") %>",
+        showConfirmButton: true
+    });
 });
 <%}%>
 

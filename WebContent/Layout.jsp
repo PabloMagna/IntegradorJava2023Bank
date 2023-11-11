@@ -12,6 +12,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </head>
 <body>
 	<%
@@ -66,8 +67,7 @@
 					href="ServletPrestamo?lista=1">Listar Préstamos Admin</a></li>
 				<li class="nav-item"><a class="nav-link"
 					href="ServletCuenta?lista=1">Listar Cuentas</a></li>
-				<li class="nav-item"><a class="nav-link" href="Informe1.jsp">Informe
-						1</a></li>
+				<li class="nav-item"><a class="nav-link" href="ReporteEstadisticoAltaCuentas.jsp">Reporte Estadístico Altas de Cuentas</a></li>
 				<li class="nav-item"><a class="nav-link" href="Informe2.jsp">Informe
 						2</a></li>
 				<%
@@ -80,7 +80,7 @@
 				</li>
 				<li class="nav-item">
 					<form id="logoutForm" action="ServletCliente" method="POST">
-						<button type="submit" class="btn btn-link" name="btnCerrarSesion">Cerrar
+						<button type="submit" id="exit" class="btn btn-link" id="exitIcon" name="btnCerrarSesion"><iconify-icon icon="mdi:exit-run"></iconify-icon> Cerrar
 							Sesión</button>
 					</form>
 				</li>
