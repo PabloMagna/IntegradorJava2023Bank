@@ -96,4 +96,6 @@ public class Prestamo {
 		return this.estado;
 	}
 	
+	
+	
 }

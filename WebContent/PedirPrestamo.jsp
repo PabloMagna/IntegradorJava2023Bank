@@ -32,9 +32,27 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <title>Solicitud de Préstamo</title>
 </head>
 <body>
+
+	<%
+			Boolean alertaExito = (Boolean) session.getAttribute("pedidoExitoso");
+			if (alertaExito != null && alertaExito) {
+	%>
+	<script>
+		Swal.fire({
+			icon : "success",
+			title : "Éxito",
+			text : "Préstamo pedido correctamente."
+		});
+	</script>
+	<%
+				session.setAttribute("pedidoExitoso", false);
+			}
+	%>
+
 	<div class="container">
 		<h1 class="mt-4">Solicitud de Préstamo</h1>
 		<p class="mb-4">
@@ -44,7 +62,9 @@
 		<form action="ServletPrestamo" method="post">
 			<div class="form-group">
 				<label for="importe">Importe:</label> <input type="text"
-					name="importe" class="form-control" required>
+					name="importe" id="importe" class="form-control" required
+					pattern="^\d{1,8}(\.\d{1,2})?$"
+					placeholder="ingresá numero ( hasta 8 enteros y 2 decimales)">
 			</div>
 
 			<div class="form-group">
@@ -57,8 +77,10 @@
 				</select>
 			</div>
 
-			<button type="submit" name="btnPedirPrestamo" class="btn btn-primary">Solicitar
+			<button type="submit" name="btnPedirPrestamo" class="btn btn-success">Solicitar
 				Préstamo</button>
+			<a class="btn btn-primary float-right" href="Inicio.jsp">Volver
+				al Inicio</a>
 		</form>
 	</div>
 </body>

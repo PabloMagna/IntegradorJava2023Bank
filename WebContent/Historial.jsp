@@ -28,16 +28,16 @@
 		document.querySelector('[name="btnBusquedaHistorial"]').click();
 	}
 	$(document).ready(function() {
-	    $('#movimientosTable').DataTable({
-	        "paging": true,
-	        "lengthMenu": [5, 10, 25, 50, 100],
-	        "pageLength": 10,
-	        "searching": false, // Configuración para desactivar la búsqueda
-	        "ordering": true,
-	        "language": {
-	            "emptyTable": "No hay movimientos disponibles en la tabla"
-	        }
-	    });
+		$('#movimientosTable').DataTable({
+			"paging" : true,
+			"lengthMenu" : [ 5, 10, 25, 50, 100 ],
+			"pageLength" : 10,
+			"searching" : false, // Configuración para desactivar la búsqueda
+			"ordering" : true,
+			"language" : {
+				"emptyTable" : "No hay movimientos disponibles en la tabla"
+			}
+		});
 	});
 </script>
 <title>Historial de Movimientos</title>
@@ -73,10 +73,10 @@
 							<%=(request.getParameter("operadorSaldo") != null
 					&& request.getParameter("operadorSaldo").equals("igual")) ? "selected" : ""%>>Igual
 							a:</option>
-					</select> <input type="text" id="saldoFiltro" name="saldoFiltro"
+					</select><input type="text" id="saldoFiltro" name="saldoFiltro"
 						class="form-control"
 						value="<%=(request.getParameter("saldoFiltro") != null) ? request.getParameter("saldoFiltro") : ""%>"
-						oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+						oninput="this.value = this.value.replace(/[^-0-9.]/g, '').replace(/(\..*)\./g, '$1');">
 					<button type="submit" name="btnFiltrarHistorial"
 						class="btn btn-success">Filtrar</button>
 					<button type="button" onclick="limpiarCampos()"
@@ -119,5 +119,6 @@
 			%>
 		</tbody>
 	</table>
+	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 </body>
 </html>

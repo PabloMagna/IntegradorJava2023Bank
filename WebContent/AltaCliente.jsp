@@ -462,6 +462,7 @@ $(function() {
 
 		<a href="ServletCliente?lista=1" class="btn btn-secondary">Volver
 			al Listado</a>
+			<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 	</form>
 
 </body>

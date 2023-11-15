@@ -212,5 +212,6 @@
 	<%
 		}
 	%>
+	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 </body>
 </html>

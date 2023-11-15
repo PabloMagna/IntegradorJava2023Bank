@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import entidad.Cliente;
 import entidad.Localidad;
 import entidad.Provincia;
+import excepciones.CorreoExistenteException;
+import excepciones.CuilExistenteException;
+import excepciones.DNIExistenteException;
+import excepciones.UsuarioExistenteException;
 import interfazDao.IClienteDao;
 
 public class ClienteDao implements IClienteDao {
@@ -263,16 +267,22 @@ public class ClienteDao implements IClienteDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    int count = resultSet.getInt("count");
-                    return count > 0 ? 0 : 1; // Devuelve 0 si el usuario existe y está activo, 1 si es único o inactivo.
+                    if(resultSet.getInt("count") > 0) {
+                    	throw new UsuarioExistenteException();
+                    }
+                    
+                    return 1; // Devuelve 0 si el usuario existe y está activo, 1 si es único o inactivo.
                 }
             }
+        } catch (UsuarioExistenteException ex) {
+        	System.err.println(ex.getMessage());
         } catch (SQLException e) {
             System.err.println("Error al verificar si el usuario es único y activo: " + e.getMessage());
         }
 
-        return 0;
+        throw new UsuarioExistenteException();
     }
+    
     @Override
     public int DniUnico(int dni, int idCliente) {
         String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE dni = ? AND activo = 1 AND idCliente <> ?";
@@ -282,35 +292,48 @@ public class ClienteDao implements IClienteDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    int count = resultSet.getInt("count");
-                    return count > 0 ? 0 : 1; // Devuelve 0 si el DNI existe y está activo, 1 si es único o inactivo.
+                	// Exception si el DNI existe y está activo, 1 si es único o inactivo.
+                    if(resultSet.getInt("count") > 0) {
+                    	throw new DNIExistenteException();
+                    }
+                    
+                    return 1;
                 }
             }
+        } catch(DNIExistenteException ex) {
+        	System.err.println(ex.getMessage());
         } catch (SQLException e) {
             System.err.println("Error al verificar si el DNI es único y activo: " + e.getMessage());
         }
 
-        return 0; // En caso de error, devolvemos 0 por defecto.
+        throw new DNIExistenteException(); // En caso de error, Exception
     }
+    
     @Override
     public int CuilUnico(String cuil, int idCliente) {
         String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE cuil = ? AND activo = 1 AND idCliente <> ?";
         try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
             statement.setString(1, cuil);
             statement.setInt(2, idCliente);
-
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    int count = resultSet.getInt("count");
-                    return count > 0 ? 0 : 1; // Devuelve 0 si el CUIL existe y está activo, 1 si es único o inactivo.
+                    if(resultSet.getInt("count") > 0) {
+                    	throw new CuilExistenteException();
+                    } 
+                    
+                    return 1;
                 }
             }
+            
+        } catch(CuilExistenteException ex) {
+        	System.err.println(ex.getMessage());
         } catch (SQLException e) {
             System.err.println("Error al verificar si el CUIL es único y activo: " + e.getMessage());
         }
 
-        return 0;
+        throw new CuilExistenteException();
     }
+    
     @Override
     public int CorreoUnico(String correo, int idCliente) {
         String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE correo = ? AND activo = 1 AND idCliente <> ?";
@@ -320,15 +343,20 @@ public class ClienteDao implements IClienteDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    int count = resultSet.getInt("count");
-                    return count > 0 ? 0 : 1; // Devuelve 0 si el correo existe y está activo, 1 si es único o inactivo.
+                    if(resultSet.getInt("count") > 0){
+                    	throw new CorreoExistenteException();
+                    }
+                    
+                    return 1; // Devuelve Exception si el correo existe y está activo, 1 si es único o inactivo.
                 }
             }
+        } catch (CorreoExistenteException ex) {
+        	System.err.println(ex.getMessage());
         } catch (SQLException e) {
             System.err.println("Error al verificar si el correo es único y activo: " + e.getMessage());
         }
 
-        return 0;
+        throw new CorreoExistenteException();
     }
 
 }

@@ -2,6 +2,7 @@
 package servlets;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -44,8 +45,6 @@ public class ServletPrestamo extends HttpServlet {
 
 			HttpSession session = request.getSession();
 
-			session.setAttribute("cuentaPrestamo", null);
-
 			int numeroCuenta = Integer.parseInt(request.getParameter("pedirPrestamo"));
 			Cuenta cuenta = cuentaNegocio.ObtenerPorNumeroCuenta(numeroCuenta);
 
@@ -55,19 +54,7 @@ public class ServletPrestamo extends HttpServlet {
 		}
 
 		if (request.getParameter("listaPagar") != null) {
-			HttpSession session = request.getSession();
-			Cliente cliente = (Cliente) session.getAttribute("cliente");
-			int idCliente = cliente.getIdCliente();
-
-			CuotaNegocio cuotaNegocio = new CuotaNegocio();
-			ArrayList<Cuota> listaCuotas = cuotaNegocio.ListarPorClienteAprobadoEImpago(idCliente);
-
-			request.setAttribute("listaCuotas", listaCuotas);
-
-			CuentaNegocio cuentaNegocio = new CuentaNegocio();
-			ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, null);
-
-			request.setAttribute("listaCuentas", listaCuentas);
+			CargarCuotasYCuentasCliente(request, response);
 
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
 			dispatcher.forward(request, response);
@@ -119,11 +106,53 @@ public class ServletPrestamo extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
 			dispatcher.forward(request, response);
 		}
+		if (request.getParameter("informe2") != null) {	
+			
+			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
+			
+			float porcentaje3 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(3, 0);
+			float porcentaje6 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(6, 0);
+			float porcentaje12 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(12, 0);
+			float porcentaje24 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(24, 0);			
+			
+			request.setAttribute("cantidad3cuotas", porcentaje3);
+			request.setAttribute("cantidad6cuotas", porcentaje6);
+			request.setAttribute("cantidad12cuotas", porcentaje12);
+			request.setAttribute("cantidad24cuotas", porcentaje24);
+
+			request.setAttribute("estado", 0);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ReporteEstadisticoCantCuotas.jsp");
+			dispatcher.forward(request, response);
+		}
+		
+		if (request.getParameter("btnFiltrarReporte2") != null) {	
+			
+			int estado = Integer.parseInt(request.getParameter("estado"));			
+			
+			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
+			
+			float porcentaje3 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(3, estado);
+			float porcentaje6 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(6, estado);
+			float porcentaje12 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(12, estado);
+			float porcentaje24 = prestamoNegocio.PorcentajePrestamosPorCantDeCuotas(24, estado);			
+			
+			request.setAttribute("cantidad3cuotas", porcentaje3);
+			request.setAttribute("cantidad6cuotas", porcentaje6);
+			request.setAttribute("cantidad12cuotas", porcentaje12);
+			request.setAttribute("cantidad24cuotas", porcentaje24);
+
+			request.setAttribute("estado", estado);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ReporteEstadisticoCantCuotas.jsp");
+			dispatcher.forward(request, response);
+		}
 
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
 		if (request.getParameter("btnPedirPrestamo") != null) {
 			HttpSession session = request.getSession();
 			Cuenta cuenta = (Cuenta) session.getAttribute("cuentaPrestamo");
@@ -146,8 +175,11 @@ public class ServletPrestamo extends HttpServlet {
 			boolean exito = prestamoNegocio.PedirPrestamo(prestamo);
 
 			if (exito) {
-				session.setAttribute("cuentaPrestamo", null);
-				response.sendRedirect(request.getContextPath() + "/ServletCuenta?listaPorId=1");
+				request.getSession().setAttribute("pedidoExitoso", true);
+
+				session.setAttribute("cuentaPrestamo", cuenta);
+
+				response.sendRedirect("PedirPrestamo.jsp");
 			}
 
 		}
@@ -180,8 +212,9 @@ public class ServletPrestamo extends HttpServlet {
 				ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes(null);
 				request.setAttribute("listaPrestamo", listaPrestamos);
 
-				RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
-				dispatcher.forward(request, response);
+				request.getSession().setAttribute("alerta", "Préstamo aceptado correctamente.");
+
+				response.sendRedirect(request.getContextPath() + "/ServletPrestamo?lista=1");
 			}
 		}
 		if (request.getParameter("btnRechazar") != null) {
@@ -190,8 +223,9 @@ public class ServletPrestamo extends HttpServlet {
 
 			prestamoNegocio.CambiarEstadoPrestamo(idPrestamo, Estado.RECHAZADO);
 
-			RequestDispatcher dispatcher = request.getRequestDispatcher("Inicio.jsp");
-			dispatcher.forward(request, response);
+			request.getSession().setAttribute("alerta", "Préstamo rechazado correctamente.");
+
+			response.sendRedirect(request.getContextPath() + "/ServletPrestamo?lista=1");
 		}
 		if (request.getParameter("btnPagar") != null) {
 			int idCuota = Integer.parseInt(request.getParameter("cuota"));
@@ -217,15 +251,40 @@ public class ServletPrestamo extends HttpServlet {
 					MovimientoNegocio movimientoNegocio = new MovimientoNegocio();
 					movimientoNegocio.Agregar(movimiento);
 
-					RequestDispatcher dispatcher = request.getRequestDispatcher("Inicio.jsp");
+					request.getSession().setAttribute("alertaExito", true);
+
+					CargarCuotasYCuentasCliente(request, response);
+
+					RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
 					dispatcher.forward(request, response);
 				}
 			} else {
 				System.out.println("no hay fondos");
 
-				// aca hay que mopstrar alertas
+				request.getSession().setAttribute("alertaError", true);
+
+				CargarCuotasYCuentasCliente(request, response);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosCliente.jsp");
+				dispatcher.forward(request, response);
 			}
 		}
+	}
+
+	private void CargarCuotasYCuentasCliente(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		Cliente cliente = (Cliente) session.getAttribute("cliente");
+		int idCliente = cliente.getIdCliente();
+
+		CuotaNegocio cuotaNegocio = new CuotaNegocio();
+		ArrayList<Cuota> listaCuotas = cuotaNegocio.ListarPorClienteAprobadoEImpago(idCliente);
+
+		request.setAttribute("listaCuotas", listaCuotas);
+
+		CuentaNegocio cuentaNegocio = new CuentaNegocio();
+		ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, null);
+
+		request.setAttribute("listaCuentas", listaCuentas);
 	}
 
 }

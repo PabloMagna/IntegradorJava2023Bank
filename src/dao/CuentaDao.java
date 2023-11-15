@@ -478,12 +478,25 @@ public class CuentaDao implements ICuentaDao {
 	}
 	@Override
 	public int CantidadCuentasEstadisticaUno(int anio, int mes) {
+		String query = "";	
 		int cantidadCuentas = 0;
+		
+		if(mes == 0) {
+			query = "SELECT COUNT(*) AS cantidad FROM cuenta WHERE YEAR(fecha) = ?";
+		}
+		else {
+			query = "SELECT COUNT(*) AS cantidad FROM cuenta WHERE YEAR(fecha) = ? AND MONTH(fecha) = ?";
+		}
 
 		try (PreparedStatement statement = conexion
-				.prepareStatement("SELECT COUNT(*) AS cantidad FROM cuenta WHERE DATEPART(YEAR, fecha) = ? AND DATEPART(MONTH, fecha) = ?")) {
-			statement.setInt(1, anio);
-			statement.setInt(2, mes);
+				.prepareStatement(query)) {
+
+			if(mes == 0) {
+		        statement.setInt(1, anio);
+		    } else {
+		        statement.setInt(1, anio);
+		        statement.setInt(2, mes);
+		    }
 			
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (resultSet.next()) {

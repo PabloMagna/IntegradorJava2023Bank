@@ -1,6 +1,8 @@
 package servlets;
 
+import java.time.LocalDate;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -61,6 +63,35 @@ public class ServletCuenta extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoCuentas.jsp");
 			dispatcher.forward(request, response);
 		}
+		
+		if (request.getParameter("informe1") != null) {			
+			int anioActual = LocalDate.now().getYear();
+			int anioPasado = (LocalDate.now().getYear()) - 1;
+			int CuentasAnioActual = cuentaNegocio.CantidadCuentasEstadisticaUno(anioActual, 0);
+			int CuentasAnioPasado = cuentaNegocio.CantidadCuentasEstadisticaUno(anioPasado, 0);
+			request.setAttribute("AltasCuentasAnioActual", CuentasAnioActual);
+			request.setAttribute("AltasCuentasAnioPasado", CuentasAnioPasado);
+
+			request.setAttribute("mes", 0);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ReporteEstadisticoAltaCuentas.jsp");
+			dispatcher.forward(request, response);
+		}
+		if (request.getParameter("btnFiltrarReporte1") != null) {			
+			int anioActual = LocalDate.now().getYear();
+			int anioPasado = (LocalDate.now().getYear()) - 1;
+			int mes = Integer.parseInt(request.getParameter("mes"));
+			int CuentasAnioActual = cuentaNegocio.CantidadCuentasEstadisticaUno(anioActual, mes);
+			int CuentasAnioPasado = cuentaNegocio.CantidadCuentasEstadisticaUno(anioPasado, mes);
+			request.setAttribute("AltasCuentasAnioActual", CuentasAnioActual);
+			request.setAttribute("AltasCuentasAnioPasado", CuentasAnioPasado);
+
+			request.setAttribute("mes", mes);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ReporteEstadisticoAltaCuentas.jsp");
+			dispatcher.forward(request, response);
+		}
+		
 
 		if (request.getParameter("EliminarNumeroCuenta") != null) {
 			int numeroCuentaAEliminar = Integer.parseInt(request.getParameter("EliminarNumeroCuenta"));

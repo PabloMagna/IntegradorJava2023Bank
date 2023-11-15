@@ -21,7 +21,7 @@
 
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 	function limpiarCampos() {
 		document.getElementById("busqueda").value = "";
@@ -33,6 +33,60 @@
 <title>Lista de Préstamos</title>
 </head>
 <body>
+	<%
+		if (request.getParameter("btnAprobar") != null) {
+			// ... tu código existente ...
+
+			// SweetAlert para la aprobación
+	%>
+	<script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Préstamo aprobado correctamente',
+                showConfirmButton: false,
+                timer: 2000
+            }).then((result) => {
+                // Redirige después de cerrar la alerta
+                window.location.href = '<%=request.getContextPath()%>/ServletPrestamo?lista=1';
+            });
+        </script>
+	<%
+		}
+		if (request.getParameter("btnRechazar") != null) {
+			// ... tu código existente ...
+
+			// SweetAlert para el rechazo
+	%>
+	<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Préstamo rechazado correctamente',
+                showConfirmButton: false,
+                timer: 2000
+            }).then((result) => {
+                // Redirige después de cerrar la alerta
+                window.location.href = '<%=request.getContextPath()%>/ServletPrestamo?lista=1';
+            });
+        </script>
+	<%
+		}
+	%>
+	<%
+		String alerta = (String) request.getSession().getAttribute("alerta");
+		if (alerta != null) {
+	%>
+	<script>
+        Swal.fire({
+            icon: "success",
+            title: "<%=alerta%>",
+            showConfirmButton: false,
+            timer: 2500
+        });
+    </script>
+	<%
+		request.getSession().removeAttribute("alerta");
+		}
+	%>
 	<h1>Lista de Préstamos</h1>
 
 	<div class="container mt-4" style="margin-bottom: 10px;">
@@ -156,5 +210,6 @@
 											});
 						});
 	</script>
+	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 </body>
 </html>

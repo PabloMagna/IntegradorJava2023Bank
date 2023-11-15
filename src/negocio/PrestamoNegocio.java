@@ -68,4 +68,10 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 
 	    return listaFiltrada;
 	}
+
+	@Override
+	public float PorcentajePrestamosPorCantDeCuotas(int cuotas, int estado) {
+		
+		return dao.PorcentajePrestamosPorCantDeCuotas(cuotas, estado);
+	}
 }

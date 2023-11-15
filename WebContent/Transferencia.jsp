@@ -12,16 +12,11 @@
 	}
 %>
 <%
-	// Obtener la cuenta de origen de la sesión
 	Cuenta cuentaOrigen = (Cuenta) request.getSession().getAttribute("cuentaOrigen");
-
-	// Verificar si la cuenta de origen no es nula
 	if (cuentaOrigen == null) {
-		// Redirigir a una página de error o realizar alguna acción apropiada
 		response.sendRedirect("error.jsp");
 	}
 
-	// Obtener un mensaje de error si existe en la solicitud
 	String errorMensaje = (String) request.getAttribute("errorMensaje");
 %>
 
@@ -65,24 +60,29 @@
 
 		<form action="ServletCuenta" method="post" class="mt-4">
 			<div class="form-group">
-				<label for="importe">Importe:</label> <input type="text"
-					name="importe" id="importe" class="form-control" required>
+				<div class="form-group">
+					<label for="importe">Importe:</label> <input type="text"
+						name="importe" id="importe" class="form-control" required
+						pattern="^\d{1,8}(\.\d{1,2})?$" placeholder="ingresá numero ( hasta 8 enteros y 2 decimales)">
+				</div>
+
+				<div class="form-group">
+					<label for="cbu">CBU (22 números):</label> <input type="text"
+						name="cbu" id="cbu" class="form-control" pattern="[0-9]{22}"
+						required>
+				</div>
+				<div class="form-group">
+					<label for="origen">Cuenta de Origen:</label> <input type="text"
+						class="form-control" value="<%=cuentaOrigen.getNumero()%>"
+						readonly> <input type="hidden" name="cuentaOrigen"
+						value="<%=cuentaOrigen.getNumero()%>">
+				</div>
+				<button type="submit" name="btnTransferir" class="btn btn-primary">Realizar
+					Transferencia</button>
 			</div>
-			<div class="form-group">
-				<label for="cbu">CBU (22 números):</label> <input type="text"
-					name="cbu" id="cbu" class="form-control" pattern="[0-9]{22}"
-					required>
-			</div>
-			<div class="form-group">
-				<label for="origen">Cuenta de Origen:</label> <input type="text"
-					class="form-control" value="<%=cuentaOrigen.getNumero()%>" readonly>
-				<input type="hidden" name="cuentaOrigen"
-					value="<%=cuentaOrigen.getNumero()%>">
-			</div>
-			<button type="submit" name="btnTransferir" class="btn btn-primary">Realizar
-				Transferencia</button>
 		</form>
 	</div>
 
+	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 </body>
 </html>

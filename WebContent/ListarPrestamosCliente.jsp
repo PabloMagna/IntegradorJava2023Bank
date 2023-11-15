@@ -27,6 +27,7 @@
 	href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 	function limpiarCampos() {
 		document.getElementById("busqueda").value = "";
@@ -49,56 +50,93 @@
 </script>
 </head>
 <body>
+
+	<%
+		// Verificar si hay una alerta de éxito y mostrarla
+		Boolean alertaExito = (Boolean) session.getAttribute("alertaExito");
+		if (alertaExito != null && alertaExito) {
+	%>
+	<script>
+		Swal.fire({
+			icon : "success",
+			title : "Éxito",
+			text : "Cuota pagada correctamente."
+		});
+	</script>
+	<%
+		// Una vez mostrada la alerta, establecerla como false
+			session.setAttribute("alertaExito", false);
+		}
+
+		// Verificar si hay una alerta de error y mostrarla
+		Boolean alertaError = (Boolean) session.getAttribute("alertaError");
+		if (alertaError != null && alertaError) {
+	%>
+	<script>
+		Swal.fire({
+			icon : "error",
+			title : "Error",
+			text : "No hay fondos suficientes en la cuenta."
+		});
+	</script>
+	<%
+		// Una vez mostrada la alerta, establecerla como false
+			session.setAttribute("alertaError", false);
+		}
+	%>
+
+
 	<h1>Lista de Préstamos</h1>
 
+	<table border="1" id="prestamosTable" class="display">
+		<thead>
+			<tr>
+				<th>ID Préstamo</th>
+				<th>Seleccionar Cuota</th>
+				<th>Importe</th>
+				<th>Seleccionar Cuenta</th>
+				<th>Pagar</th>
+			</tr>
+		</thead>
+		<tbody>
+			<%
+				ArrayList<Cuota> listaCuotas = (ArrayList<Cuota>) request.getAttribute("listaCuotas");
+				ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) request.getAttribute("listaCuentas");
 
-	<form action="ServletPrestamo" method="post">
-		<table border="1" id="prestamosTable" class="display">
-			<thead>
-				<tr>
-					<th>ID Préstamo</th>
-					<th>Seleccionar Cuota</th>
-					<th>Importe</th>
-					<th>Seleccionar Cuenta</th>
-					<th>Pagar</th>
-				</tr>
-			</thead>
-			<tbody>
-				<%
-					ArrayList<Cuota> listaCuotas = (ArrayList<Cuota>) request.getAttribute("listaCuotas");
-					ArrayList<Cuenta> listaCuentas = (ArrayList<Cuenta>) request.getAttribute("listaCuentas");
+				if (listaCuotas != null) {
+					Set<Integer> idPrestamosUnicos = new HashSet<>();
+					for (Cuota cuota : listaCuotas) {
+						idPrestamosUnicos.add(cuota.getPrestamo().getIdPrestamo());
+					}
 
-					if (listaCuotas != null) {
-						Set<Integer> idPrestamosUnicos = new HashSet<>();
+					for (Integer idPrestamo : idPrestamosUnicos) {
+						ArrayList<Cuota> cuotasDelPrestamo = new ArrayList<Cuota>();
 						for (Cuota cuota : listaCuotas) {
-							idPrestamosUnicos.add(cuota.getPrestamo().getIdPrestamo());
-						}
-
-						for (Integer idPrestamo : idPrestamosUnicos) {
-							ArrayList<Cuota> cuotasDelPrestamo = new ArrayList<Cuota>();
-							for (Cuota cuota : listaCuotas) {
-								if (cuota.getPrestamo().getIdPrestamo() == idPrestamo) {
-									cuotasDelPrestamo.add(cuota);
-								}
+							if (cuota.getPrestamo().getIdPrestamo() == idPrestamo) {
+								cuotasDelPrestamo.add(cuota);
 							}
-				%>
-				<tr>
+						}
+			%>
+			<tr>
+				<form action="ServletPrestamo" method="post"
+					id="form<%=idPrestamo%>">
 					<td><%=idPrestamo%></td>
 					<td><select name="cuota" class="form-select">
-							<option value="">Seleccionar Cuota</option>
 							<%
 								for (Cuota cuota : cuotasDelPrestamo) {
 							%>
-							<option value="<%=cuota.getIdCuota()%>"><%=cuota.getNumeroCuota()%></option>
+							<option value="<%=cuota.getIdCuota()%>"
+								<%if (cuotasDelPrestamo.indexOf(cuota) == 0)
+							out.print("selected");%>><%=cuota.getNumeroCuota()%></option>
 							<%
 								}
 							%>
 					</select></td>
 
 					<td><input id="importe" name="importe"
-						value=<%=cuotasDelPrestamo.get(0).getImporte()%> readonly></td>
+						value=<%=cuotasDelPrestamo.get(0).getImporte()%> readonly>
+					</td>
 					<td><select name="cuenta" class="form-select">
-							<option value="">Seleccionar Cuenta</option>
 							<%
 								for (Cuenta cuenta : listaCuentas) {
 							%>
@@ -113,19 +151,20 @@
 							<i class="bi bi-cash"></i> Pagar
 						</button>
 					</td>
-				</tr>
-				<%
-					}
-					} else {
-				%>
-				<tr>
-					<td colspan="5">No hay préstamos para mostrar.</td>
-				</tr>
-				<%
-					}
-				%>
-			</tbody>
-		</table>
-	</form>
+				</form>
+			</tr>
+			<%
+				}
+				} else {
+			%>
+			<tr>
+				<td colspan="5">No hay préstamos para mostrar.</td>
+			</tr>
+			<%
+				}
+			%>
+		</tbody>
+	</table>
+	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 </body>
 </html>

@@ -3,7 +3,6 @@ package dao;
 import entidad.Cliente;
 import entidad.Cuenta;
 import entidad.Cuota;
-import entidad.Cuota.Estado;
 import entidad.Localidad;
 import entidad.Prestamo;
 import entidad.Provincia;

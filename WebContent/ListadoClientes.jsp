@@ -96,16 +96,13 @@
 		</form>
 	</div>
 	<%
-		if (request.getAttribute("exitoModificacion") != null
-				&& (boolean) request.getAttribute("exitoModificacion")) {
+		String alerta = (String) request.getAttribute("alerta");
+		if (alerta != null) {
 	%>
-	<!-- Antes: Mostrar mensaje de éxito utilizando Bootstrap -->
-	<!--<div class="alert alert-success" role="alert">Modificado con éxito.</div>-->
 	<script>
-        // Nuevo: Reemplazar con SweetAlert
         Swal.fire({
             icon: "success",
-            title: "Modificado con éxito",
+            title: "<%=alerta%>",
             showConfirmButton: false,
             timer: 2500
         });
@@ -125,6 +122,22 @@
         Swal.fire({
             icon: "success",
             title: "Cliente eliminado correctamente",
+            showConfirmButton: false,
+            timer: 2500
+        });
+    </script>
+	<%
+		}
+	%>
+	
+	<%
+		if (request.getAttribute("exitoModificacion") != null
+				&& (boolean) request.getAttribute("exitoModificacion")) {
+	%>
+	<script>
+        Swal.fire({
+            icon: "success",
+            title: "Cliente Modificado correctamente",
             showConfirmButton: false,
             timer: 2500
         });
@@ -235,6 +248,7 @@
 	<%
 		}
 	%>
+	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 	<script>
 		function confirmarEliminacionCliente(idCliente) {
 			//const confirmacion = confirm("¿Seguro que deseas eliminar a este cliente?");

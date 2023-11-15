@@ -14,42 +14,37 @@ body{
 			margin: 0;
 			text-transform: uppercase;
 		}	
-		.ul-layout li{
-  			background-color: black;
-		  	color: white; 
-		  	padding: 5px 0; 
-		  	margin: 0 15px;			  	  			  	
-		}
-		.ul-layout a{
-			text-decoration: none;
-			color: white; 
-		}
-		.ul-layout h3{
-			color: white; 
-			margin-bottom: 2px;
-		}
-		.ul-layout{
+		.li-layout a{  						
+		  	margin: 10px;	
+		  	background-color: #C7EFFF; 	  	  			  	
+		}	
+		.li-layout a:hover{
+  			background-color: #58D3F7; 
+		}		
+		
+		#homeLink{
+			color: #58D3F7;
 			background-color: black;
-			display: flex;
-			justify-content: space-around;
-			list-style: none;
-			padding: 0;
-			height: 50px;
-			margin: 0;
+			border: 1px solid #828282;
+			text-decoration: none;			
+			padding: 5px;
+			border-radius: 0.4rem;
 		}
-		.img-layout{
-			height: 18px;
+		
+		#li-usuario{
+			margin-left: 20px;
 		}
 	
 		#exit{
 			background-color: #58D3F7;
 			border: 1px solid #828282;
 			text-decoration: none;
+			padding: 8px;
+			color: black;			
 		}
 		
 		#exitIcon{
-			font-size: 20px;
-			color: #828282;
+			font-size: 20px;			
 		}
 		
 		#tituloReporte{
@@ -66,17 +61,24 @@ body{
 		#cuadroReporte{
 			display: flex;
 			justify-content: center;
-			align-items: center;
-			
+			align-items: center;			
 		}
 		
 		#grillaReporte{
 			width: 100%;
 	      	margin: auto;
-	      	background-color: #58D3F7;
-	      	border-radius: 0.4rem;
+	      	/*background-color: #58D3F7;*/	      	
 		}
 		
-		#divAnioAnterior, #divAnioActual{
-			margin:10px 0;
+		#divAnioAnterior, #divAnioActual, #div3cuotas, #div6cuotas, #div12cuotas, #div24cuotas {
+			padding:10px 0;
+			background-color: #58D3F7;
+			border-radius: 0.4rem;
+			margin: 5px;
 		}
+		#cuadroReporte2{
+			width: 100%;
+			margin: auto;
+		}
+		
+

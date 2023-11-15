@@ -413,4 +413,37 @@ public class PrestamoDao implements IPrestamoDao {
 		return prestamosAprobados;
 	}
 
+	@Override
+	public float PorcentajePrestamosPorCantDeCuotas(int cuotas, int estado) {
+		
+		estado--; //Le resto 1 porque en el desplegable va de 0 a 3 (el 0 es para mostrar todos los estados) y el enum es de 0 a 2.		
+		int totalPrestamos = 0;
+		int prestamosPorCantCuotas = 0;
+		
+		ArrayList<Prestamo> lista = ListarTodos();
+		
+		for (Prestamo prestamo : lista) {			
+			if(estado < 0) {
+				totalPrestamos ++;
+				if(prestamo.getCuotas() == cuotas) {
+					prestamosPorCantCuotas ++;
+				}
+			}		
+			else {
+				if(prestamo.getEstado().ordinal() == estado ) {
+					totalPrestamos ++;
+					if(prestamo.getCuotas() == cuotas) {
+						prestamosPorCantCuotas ++;
+					}					
+				}
+			}			
+		}
+		if(totalPrestamos == 0) {
+			return 0;
+		}
+		
+		
+		float porcentaje = ((float) prestamosPorCantCuotas / totalPrestamos) * 100;
+		return porcentaje;
+	}
 }

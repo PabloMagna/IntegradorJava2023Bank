@@ -1,18 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="entidad.Cuenta"%>
+<%@ page import="java.time.LocalDate" %>
 <%@ page import="java.util.ArrayList"%>
 <%@include file="Layout.jsp"%>
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<link rel="stylesheet" type="text/css" href="css/Layout.css">
+<head>	
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
-	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<link rel="stylesheet" type="text/css" href="css/Layout.css">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">	
 	<title>Reporte estadistico 1</title>
 </head>
 <body>
@@ -20,7 +19,11 @@
 	</br>
 	<h5 id="descripcionReporte"><i>Comparación de registros entre períodos del año actual y año anterior.</i></h5>
 	</br>
+	
+	<% Integer AltasCuentasAnioActual = (Integer)request.getAttribute("AltasCuentasAnioActual"); %>
+	<% Integer AltasCuentasAnioPasado = (Integer)request.getAttribute("AltasCuentasAnioPasado"); %>
 
+	
 	<div id="cuadroReporte" class="grid text-center" style="--bs-columns: 3;">
 	  <div>
 	    <h2>Seleccione el período</h2>  	
@@ -30,6 +33,11 @@
 					<div class="text-center">					
 						<div class="input-group">
 							<select name="mes" class="form-select">
+							<option value="0"
+									<%=(request.getParameter("mes") != null 
+									&& request.getParameter("mes").equals("1")) ? "selected" : "" %>>
+									Todo el año
+								</option>
 								<option value="1"
 									<%=(request.getParameter("mes") != null 
 									&& request.getParameter("mes").equals("1")) ? "selected" : "" %>>
@@ -92,21 +100,20 @@
 								</option>
 								
 							</select> 
-							<button type="submit" name="btnFiltrarReporte1" class="btn btn-primary btn-success">Filtrar</button>
-							<button type="button" onclick="crearMetodoLimpiarFiltro()"
-								class="btn btn-primary">Todo el año</button>
+							<button type="submit" name="btnFiltrarReporte1" class="btn btn-primary">Filtrar</button>							
 						</div>
 					</div>
 				</form>
 		    </div>
-	      	<div id="divAnioAnterior">
-		      	<h2>2022</h2>
-		      	<h3 id="cantidad2022">2 Cuentas</h3>
-			</div>
-			<hr>
+		    <% int anioActual = LocalDate.now().getYear(); %>
+		    <% int anioPasado = LocalDate.now().getYear() - 1; %>
 	      	<div id="divAnioActual">
-	      		<h2>2023</h2>
-		      	<h3 id="cantidad2023">6 Cuentas</h3>
+		      	<h2><%=anioActual %></h2>
+		      	<h3 id="cantidadActual"><%=AltasCuentasAnioActual%> Altas de Cuentas</h3>
+			</div>			
+	      	<div id="divAnioAnterior">
+	      		<h2><%=anioPasado %></h2>
+		      	<h3 id="cantidadAnterior"><%=AltasCuentasAnioPasado%> Altas de Cuentas</h3>
 			</div>
 	    </div>
 	  </div>
