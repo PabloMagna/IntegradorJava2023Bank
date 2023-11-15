@@ -27,6 +27,27 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+
+
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		var saldoInput = document.getElementById("saldo");
+
+		saldoInput.addEventListener("input", function() {
+			var value = saldoInput.value;
+			if (!isValidNumber(value)) {
+				saldoInput.setCustomValidity("Debe ser un número válido.");
+			} else {
+				saldoInput.setCustomValidity("");
+			}
+		});
+
+		function isValidNumber(value) {
+			var regex = /^\d+(\.\d{0,2})?$/;
+			return regex.test(value);
+		}
+	});
+</script>
 </head>
 <body>
 	<%
@@ -34,7 +55,8 @@
 		if (cuenta != null) {
 	%>
 	<div class="container mt-5">
-		<h1 class="mb-4">Formulario para Modificar una Cuenta</h1>
+	<div class="border rounded p-4 mx-auto" style="max-width: 650px;">
+		<h2 class="mb-4">Formulario para Modificar una Cuenta</h2>
 		<form action="ServletCuenta" method="post">
 			<div class="mb-3">
 				<label for="idCliente" class="form-label">ID del Cliente:</label> <input
@@ -84,52 +106,16 @@
 					type="text" name="saldo" value="<%=saldoFormateado%>" id="saldo"
 					maxlength="11" class="form-control" required>
 			</div>
-
-			<script>
-				document
-						.addEventListener(
-								"DOMContentLoaded",
-								function() {
-									var saldoInput = document
-											.getElementById("saldo");
-
-									saldoInput
-											.addEventListener(
-													"input",
-													function() {
-														var value = saldoInput.value;
-														if (!isValidNumber(value)) {
-															saldoInput
-																	.setCustomValidity("Debe ser un número válido.");
-														} else {
-															saldoInput
-																	.setCustomValidity("");
-														}
-													});
-
-									function isValidNumber(value) {
-										var regex = /^\d+(\.\d{0,2})?$/;
-										return regex.test(value);
-									}
-								});
-			</script>
-
-
-
-			<button type="submit" class="btn btn-primary" name="btnModificar">Modificar
+			<button type="submit" class="btn btn-success" name="btnModificar">Modificar
 				Cuenta</button>
 		</form>
 	</div>
-	<%
-		} else {
-	%>
-	<div class="container mt-5">
-		<p class="alert alert-danger">La cuenta no se pudo cargar
-			correctamente.</p>
 	</div>
 	<%
 		}
 	%>
-	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
+	<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-5" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
 </body>
 </html>

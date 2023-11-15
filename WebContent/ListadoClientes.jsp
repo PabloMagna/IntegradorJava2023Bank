@@ -30,6 +30,24 @@
 	});
 	<script type="text/javascript">
 </script>
+
+<script>
+		function confirmarEliminacionCliente(idCliente) {
+				Swal.fire({
+		            title: '¿Seguro que deseas eliminar a este cliente?',
+		            icon: 'warning',
+		            showCancelButton: true,
+		            confirmButtonText: 'Sí, eliminar',
+		            cancelButtonText: 'Cancelar'
+		        }).then((result) => {
+		            if (result.isConfirmed) {
+		                window.location.href = "ServletCliente?ElimId=" + idCliente;
+		            }
+		        });
+			} 
+		//}
+	</script>
+
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#clientesTable').DataTable({
@@ -51,50 +69,7 @@
 </script>
 </head>
 <body>
-	<h2>Listado de Clientes</h2>
 
-	<div class="container mt-4">
-		<form method="get" action="ServletCliente" class="row g-3">
-			<div class="col-md-6">
-				<label for="busqueda" class="form-label">Buscar:</label>
-				<div class="input-group">
-					<input type="text" id="busqueda" name="busqueda"
-						class="form-control"
-						value="<%=(request.getParameter("busqueda") != null) ? request.getParameter("busqueda") : ""%>">
-					<button type="submit" name="btnBusqueda" class="btn btn-primary">Buscar</button>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<label for="edad" class="form-label">Edad:</label>
-				<div class="input-group">
-					<select name="operadorEdad" class="form-select">
-						<option value="mayor"
-							<%=(request.getParameter("operadorEdad") != null
-					&& request.getParameter("operadorEdad").equals("mayor")) ? "selected" : ""%>>Mayor
-							que:</option>
-						<option value="menor"
-							<%=(request.getParameter("operadorEdad") != null
-					&& request.getParameter("operadorEdad").equals("menor")) ? "selected" : ""%>>Menor
-							que:</option>
-						<option value="igual"
-							<%=(request.getParameter("operadorEdad") != null
-					&& request.getParameter("operadorEdad").equals("igual")) ? "selected" : ""%>>Igual
-							a:</option>
-					</select><input type="number" id="edad" name="edad"
-						value="<%=(request.getParameter("edad") != null && !request.getParameter("edad").isEmpty())
-					? request.getParameter("edad")
-					: ""%>"
-						class="form-control"
-						oninput="this.value = this.value.replace(/[^0-9]/g, '');" step="1">
-
-
-					<button type="submit" name="btnFiltrar" class="btn btn-success">Filtrar</button>
-					<button type="button" onclick="limpiarCampos()"
-						class="btn btn-secondary">Limpiar Campos</button>
-				</div>
-			</div>
-		</form>
-	</div>
 	<%
 		String alerta = (String) request.getAttribute("alerta");
 		if (alerta != null) {
@@ -129,7 +104,7 @@
 	<%
 		}
 	%>
-	
+
 	<%
 		if (request.getAttribute("exitoModificacion") != null
 				&& (boolean) request.getAttribute("exitoModificacion")) {
@@ -147,128 +122,154 @@
 	%>
 
 
+	<div class="container">
+		<h1 class="text-center mt-2">Listado de Clientes</h1>
 
-	<%
-		ArrayList<Cliente> lista = (ArrayList<Cliente>) request.getAttribute("lista");
-		ArrayList<Telefono> telefonosCliente = (ArrayList<Telefono>) request.getAttribute("listaTelefonos");
+		<form method="get" action="ServletCliente" class="row g-3 mb-5 mt-2">
+			<div class="col-md-6">
+				<label for="busqueda" class="form-label">Buscar:</label>
+				<div class="input-group">
+					<input type="text" id="busqueda" name="busqueda"
+						class="form-control"
+						value="<%=(request.getParameter("busqueda") != null) ? request.getParameter("busqueda") : ""%>">
+					<button type="submit" name="btnBusqueda" class="btn btn-primary">Buscar</button>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<label for="edad" class="form-label" >Edad:</label>
+				<div class="input-group">
+					<select name="operadorEdad" class="form-select">
+						<option value="mayor"
+							<%=(request.getParameter("operadorEdad") != null
+					&& request.getParameter("operadorEdad").equals("mayor")) ? "selected" : ""%>>Mayor
+							que:</option>
+						<option value="menor"
+							<%=(request.getParameter("operadorEdad") != null
+					&& request.getParameter("operadorEdad").equals("menor")) ? "selected" : ""%>>Menor
+							que:</option>
+						<option value="igual"
+							<%=(request.getParameter("operadorEdad") != null
+					&& request.getParameter("operadorEdad").equals("igual")) ? "selected" : ""%>>Igual
+							a:</option>
+					</select><input type="number" id="edad" name="edad"
+						value="<%=(request.getParameter("edad") != null && !request.getParameter("edad").isEmpty())
+					? request.getParameter("edad")
+					: ""%>"
+						class="form-control"
+						oninput="this.value = this.value.replace(/[^0-9]/g, '');" step="1" placeholder="Años">
 
-		if (lista != null && !lista.isEmpty()) {
-	%>
-	<table border="1" id="clientesTable" class="display">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Usuario</th>
-				<th>Contraseña</th>
-				<th>Activo</th>
-				<th>Fecha de Creación</th>
-				<th>Tipo de Cliente</th>
-				<th>DNI</th>
-				<th>CUIL</th>
-				<th>Nombre</th>
-				<th>Apellido</th>
-				<th>Sexo</th>
-				<th>Nacionalidad</th>
-				<th>Fecha de Nacimiento</th>
-				<th>Dirección</th>
-				<th>Correo</th>
-				<th>Localidad</th>
-				<th>Provincia</th>
-				<th>Teléfonos</th>
-				<th>Acciones</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%
-				for (Cliente cliente2 : lista) {
-			%>
-			<tr>
-				<td><%=cliente2.getIdCliente()%></td>
-				<td><%=cliente2.getUsuario()%></td>
-				<td><%=cliente2.getContrasena()%></td>
-				<td><%=(cliente2.getActivo() == 1) ? "Activo" : "Inactivo"%></td>
-				<td><%=cliente2.getFechaCreacion()%></td>
-				<td><%=(cliente2.getTipoCliente() == Cliente.TipoCliente.CLIENTE) ? "Cliente" : "Administrador"%></td>
-				<td><%=cliente2.getDni()%></td>
-				<td><%=cliente2.getCuil()%></td>
-				<td><%=cliente2.getNombre()%></td>
-				<td><%=cliente2.getApellido()%></td>
-				<td><%=cliente2.getSexo()%></td>
-				<td><%=cliente2.getNacionalidad()%></td>
-				<td><%=cliente2.getFechaNacimiento()%></td>
-				<td><%=cliente2.getDireccion()%></td>
-				<td><%=cliente2.getCorreo()%></td>
-				<td><%=cliente2.getLocalidad().getNombre()%></td>
-				<td><%=cliente2.getProvincia().getNombre()%></td>
-				<td><select name="telefonosCliente">
-						<%
-							boolean clienteTieneNumeros = false; // Variable de bandera para realizar un seguimiento
-									if (telefonosCliente != null && !telefonosCliente.isEmpty()) {
-										for (Telefono telefono : telefonosCliente) {
-											if (telefono.getCliente().getIdCliente() == cliente2.getIdCliente()) {
-						%>
-						<option value="<%=telefono.getNumero()%>"><%=telefono.getNumero()%></option>
-						<%
-							clienteTieneNumeros = true; // El cliente tiene números
+
+					<button type="submit" name="btnFiltrar" class="btn btn-success">Filtrar</button>
+					<button type="button" onclick="limpiarCampos()"
+						class="btn btn-secondary">Limpiar Campos</button>
+				</div>
+			</div>
+		</form>
+	</div>
+
+		<%
+			ArrayList<Cliente> lista = (ArrayList<Cliente>) request.getAttribute("lista");
+			ArrayList<Telefono> telefonosCliente = (ArrayList<Telefono>) request.getAttribute("listaTelefonos");
+
+			if (lista != null && !lista.isEmpty()) {
+		%>
+		<table border="1" id="clientesTable" class="display">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Usuario</th>
+					<th>Contraseña</th>
+					<th>Activo</th>
+					<th>Fecha de Creación</th>
+					<th>Tipo de Cliente</th>
+					<th>DNI</th>
+					<th>CUIL</th>
+					<th>Nombre</th>
+					<th>Apellido</th>
+					<th>Sexo</th>
+					<th>Nacionalidad</th>
+					<th>Fecha de Nacimiento</th>
+					<th>Dirección</th>
+					<th>Correo</th>
+					<th>Localidad</th>
+					<th>Provincia</th>
+					<th>Teléfonos</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%
+					for (Cliente cliente2 : lista) {
+				%>
+				<tr>
+					<td><%=cliente2.getIdCliente()%></td>
+					<td><%=cliente2.getUsuario()%></td>
+					<td><%=cliente2.getContrasena()%></td>
+					<td><%=(cliente2.getActivo() == 1) ? "Activo" : "Inactivo"%></td>
+					<td><%=cliente2.getFechaCreacion()%></td>
+					<td><%=(cliente2.getTipoCliente() == Cliente.TipoCliente.CLIENTE) ? "Cliente" : "Administrador"%></td>
+					<td><%=cliente2.getDni()%></td>
+					<td><%=cliente2.getCuil()%></td>
+					<td><%=cliente2.getNombre()%></td>
+					<td><%=cliente2.getApellido()%></td>
+					<td><%=cliente2.getSexo()%></td>
+					<td><%=cliente2.getNacionalidad()%></td>
+					<td><%=cliente2.getFechaNacimiento()%></td>
+					<td><%=cliente2.getDireccion()%></td>
+					<td><%=cliente2.getCorreo()%></td>
+					<td><%=cliente2.getLocalidad().getNombre()%></td>
+					<td><%=cliente2.getProvincia().getNombre()%></td>
+					<td><select name="telefonosCliente">
+							<%
+								boolean clienteTieneNumeros = false; // Variable de bandera para realizar un seguimiento
+										if (telefonosCliente != null && !telefonosCliente.isEmpty()) {
+											for (Telefono telefono : telefonosCliente) {
+												if (telefono.getCliente().getIdCliente() == cliente2.getIdCliente()) {
+							%>
+							<option value="<%=telefono.getNumero()%>"><%=telefono.getNumero()%></option>
+							<%
+								clienteTieneNumeros = true; // El cliente tiene números
+												}
 											}
 										}
-									}
 
-									if (!clienteTieneNumeros) {
-						%>
-						<option value="No posee números">No posee números</option>
-						<%
-							}
-						%>
-				</select></td>
+										if (!clienteTieneNumeros) {
+							%>
+							<option value="No posee números">No posee números</option>
+							<%
+								}
+							%>
+					</select></td>
 
-				<td><a
-					href="ServletCliente?ModifId=<%=cliente2.getIdCliente()%>"
-					class="btn btn-success" data-toggle="tooltip" data-placement="top"
-					title="Modificar"> <i class="bi bi-pencil"></i>
-				</a> <a href="ServletCuenta?AgregarId=<%=cliente2.getIdCliente()%>"
-					class="btn btn-primary" data-toggle="tooltip" data-placement="top"
-					title="Agregar Cuenta"> <i class="bi bi-plus"></i>
-				</a> <a href="#" class="btn btn-danger" data-toggle="tooltip"
-					data-placement="top" title="Eliminar"
-					onclick="confirmarEliminacionCliente(<%=cliente2.getIdCliente()%>);">
-						<i class="bi bi-trash"></i>
-				</a></td>
+					<td><a
+						href="ServletCliente?ModifId=<%=cliente2.getIdCliente()%>"
+						class="btn btn-success" data-toggle="tooltip" data-placement="top"
+						title="Modificar"> <i class="bi bi-pencil"></i>
+					</a> <a href="ServletCuenta?AgregarId=<%=cliente2.getIdCliente()%>"
+						class="btn btn-primary" data-toggle="tooltip" data-placement="top"
+						title="Agregar Cuenta"> <i class="bi bi-plus"></i>
+					</a> <a href="#" class="btn btn-danger" data-toggle="tooltip"
+						data-placement="top" title="Eliminar"
+						onclick="confirmarEliminacionCliente(<%=cliente2.getIdCliente()%>);">
+							<i class="bi bi-trash"></i>
+					</a></td>
 
-			</tr>
-			<%
-				}
-			%>
-		</tbody>
-	</table>
-	<%
-		} else {
-	%>
-	<p>No hay clientes para mostrar.</p>
-	<%
-		}
-	%>
-	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
-	<script>
-		function confirmarEliminacionCliente(idCliente) {
-			//const confirmacion = confirm("¿Seguro que deseas eliminar a este cliente?");
-			//if (confirmacion) {
-				//window.location.href = "ServletCliente?ElimId=" + idCliente;
-				Swal.fire({
-		            title: '¿Seguro que deseas eliminar a este cliente?',
-		            icon: 'warning',
-		            showCancelButton: true,
-		            confirmButtonText: 'Sí, eliminar',
-		            cancelButtonText: 'Cancelar'
-		        }).then((result) => {
-		            if (result.isConfirmed) {
-		                // Si el usuario hace clic en "Sí, eliminar", realiza la eliminación
-		                window.location.href = "ServletCliente?ElimId=" + idCliente;
-		            }
-		        });
-			} 
-		//}
-	</script>
+				</tr>
+				<%
+					}
+				%>
+			</tbody>
+		</table>
+		<%
+			} else {
+		%>
+		<p>No hay clientes para mostrar.</p>
+		<%
+			}
+		%>
+		<div class="text-center">
+  <a class="btn btn-primary mx-auto" href="Inicio.jsp">Volver al Inicio</a>
+</div>
 </body>
 </html>
 

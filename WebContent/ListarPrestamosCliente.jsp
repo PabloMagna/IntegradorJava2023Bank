@@ -86,7 +86,7 @@
 	%>
 
 
-	<h1>Lista de Préstamos</h1>
+	<h1 class="text-center mt-2">Pagar Cuotas de Préstamos</h1>
 
 	<table border="1" id="prestamosTable" class="display">
 		<thead>
@@ -134,7 +134,7 @@
 					</select></td>
 
 					<td><input id="importe" name="importe"
-						value=<%=cuotasDelPrestamo.get(0).getImporte()%> readonly>
+						value=<%=cuotasDelPrestamo.get(0).getImporte()%> class="border-0" readonly>
 					</td>
 					<td><select name="cuenta" class="form-select">
 							<%
@@ -165,6 +165,8 @@
 			%>
 		</tbody>
 	</table>
-	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
+	<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
 </body>
 </html>

@@ -87,10 +87,10 @@
 		request.getSession().removeAttribute("alerta");
 		}
 	%>
-	<h1>Lista de Préstamos</h1>
+	<h1 class="text-center mt-2">Préstamos Pendientes de Aprobación</h1>
 
-	<div class="container mt-4" style="margin-bottom: 10px;">
-		<form method="get" action="ServletPrestamo" class="row g-3">
+	<div class="container mt-2" style="margin-bottom: 10px;">
+		<form method="get" action="ServletPrestamo" class="row g-3 mt-2 mb-5">
 			<div class="col-md-6">
 				<label for="busqueda" class="form-label">Buscar:</label>
 				<div class="input-group">
@@ -210,6 +210,8 @@
 											});
 						});
 	</script>
-	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
+	<div class="text-center">
+  <a class="btn btn-primary mx-auto" href="Inicio.jsp">Volver al Inicio</a>
+</div>
 </body>
 </html>

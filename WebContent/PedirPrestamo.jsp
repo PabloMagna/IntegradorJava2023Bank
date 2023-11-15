@@ -54,6 +54,7 @@
 	%>
 
 	<div class="container">
+	<div class="border rounded p-4 mx-auto mt-3" style="max-width: 600px;">
 		<h1 class="mt-4">Solicitud de Préstamo</h1>
 		<p class="mb-4">
 			Número de Cuenta:
@@ -79,9 +80,11 @@
 
 			<button type="submit" name="btnPedirPrestamo" class="btn btn-success">Solicitar
 				Préstamo</button>
-			<a class="btn btn-primary float-right" href="Inicio.jsp">Volver
-				al Inicio</a>
 		</form>
+		</div>
+	</div>
+	<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
 	</div>
 </body>
 </html>

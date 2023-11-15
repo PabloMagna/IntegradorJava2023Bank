@@ -43,9 +43,9 @@
 <title>Historial de Movimientos</title>
 </head>
 <body>
-	<h1>Historial de Movimientos</h1>
+	<h1 class="text-center mt-2">Historial de Movimientos</h1>
 
-	<div class="container mt-4" style="margin-bottom: 10px;">
+	<div class="container mt-4 mb-4" style="margin-bottom: 10px;">
 		<form method="get" action="ServletCuenta" class="row g-3">
 			<div class="col-md-6">
 				<label for="busqueda" class="form-label">Buscar:</label>
@@ -119,6 +119,8 @@
 			%>
 		</tbody>
 	</table>
-	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
+	<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
 </body>
 </html>

@@ -69,6 +69,9 @@
 			<td>120.25</td>
 		</tr>
 	</table>
+	<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
 </body>
 </html>
 

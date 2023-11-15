@@ -35,9 +35,6 @@
 <title>Transferencia</title>
 </head>
 <body>
-	<div class="container">
-		<h1 class="mt-4">Realizar Transferencia</h1>
-
 		<%
 			if (errorMensaje != null) {
 				String iconType = (errorMensaje.equals("Transferencia exitosa.")) ? "success" : "error";
@@ -54,10 +51,10 @@
 		<%
 			}
 		%>
-
-
-
-
+		
+	<div class="container">
+	<div class="border rounded p-4 mx-auto mt-3" style="max-width: 600px;">
+		<h1 class="mt-4">Realizar Transferencia</h1>
 		<form action="ServletCuenta" method="post" class="mt-4">
 			<div class="form-group">
 				<div class="form-group">
@@ -77,12 +74,15 @@
 						readonly> <input type="hidden" name="cuentaOrigen"
 						value="<%=cuentaOrigen.getNumero()%>">
 				</div>
-				<button type="submit" name="btnTransferir" class="btn btn-primary">Realizar
+				<button type="submit" name="btnTransferir" class="btn btn-success">Realizar
 					Transferencia</button>
 			</div>
 		</form>
+		</div>
 	</div>
 
-	<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
+	<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
 </body>
 </html>

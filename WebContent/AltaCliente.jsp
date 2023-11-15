@@ -196,24 +196,24 @@ function validarCampos() {
 
         if (elemento.name === "nombre" || elemento.name === "apellido" || elemento.name === "nacionalidad") {
             if (valor.length < 3) {
-                alert("El campo '" + elemento.placeholder + "' debe tener al menos 3 caracteres.");
+                Swal.fire("Error", "El campo '" + elemento.placeholder + "' debe tener al menos 3 caracteres.", "error");
                 elemento.focus();
                 return false;
             }
             if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor)) {
-                alert("El campo '" + elemento.placeholder + "' solo debe contener letras y espacios.");
+                Swal.fire("Error", "El campo '" + elemento.placeholder + "' solo debe contener letras y espacios.", "error");
                 elemento.focus();
                 return false;
             }
         } else if (elemento.name === "dni" || elemento.name === "cuil") {
             if (!/^\d+$/.test(valor) || valor.length < 6) {
-                alert("El campo '" + elemento.placeholder + "' debe contener solo números y tener al menos 6 dígitos.");
+                Swal.fire("Error", "El campo '" + elemento.placeholder + "' debe contener solo números y tener al menos 6 dígitos.", "error");
                 elemento.focus();
                 return false;
             }
         } else if (elemento.name === "usuario" || elemento.name === "contrasena") {
             if (valor.length < 3) {
-                alert("El campo '" + elemento.placeholder + "' debe tener al menos 3 caracteres.");
+                Swal.fire("Error", "El campo '" + elemento.placeholder + "' debe tener al menos 3 caracteres.", "error");
                 elemento.focus();
                 return false;
             }
@@ -222,12 +222,12 @@ function validarCampos() {
             }
         } else if (elemento.name === "direccion") {
             if (valor.length < 5) {
-                alert("El campo '" + elemento.placeholder + "' debe tener al menos 5 caracteres.");
+                Swal.fire("Error", "El campo '" + elemento.placeholder + "' debe tener al menos 5 caracteres.", "error");
                 elemento.focus();
                 return false;
             }
             if (!/^[A-Za-z0-9\s]+$/.test(valor)) {
-                alert("El campo '" + elemento.placeholder + "' solo debe contener letras, números y espacios.");
+                Swal.fire("Error", "El campo '" + elemento.placeholder + "' solo debe contener letras, números y espacios.", "error");
                 elemento.focus();
                 return false;
             }
@@ -237,13 +237,12 @@ function validarCampos() {
     }
 
     if (contrasena !== confirmacionContrasena) {
-        alert("La contraseña y la confirmación de contraseña no coinciden.");
+        Swal.fire("Error", "La contraseña y la confirmación de contraseña no coinciden.", "error");
         return false;
     }
 
     return true;
 }
-
 //Verificar la presencia del parámetro "exito" en la URL y mostrar un mensaje de éxito si está presente
 <%if (request.getParameter("exito") != null && request.getParameter("exito").equals("true")) {%>
 // alert("Cliente agregado exitosamente.");
@@ -276,8 +275,6 @@ document.getElementById("nuevoTelefono").value = ""; // Limpia el campo de nuevo
 
 <%if (request.getParameter("exito") != null && request.getParameter("exito").equals("true")) {%>
 $(function() {
-    // Muestra el mensaje de éxito
-    //$("#mensajeExito").show();
 	Swal.fire({
         position: "center",
         icon: "success",
@@ -290,12 +287,10 @@ $(function() {
 
 <%if (request.getAttribute("advertencia") != null) {%>
 $(function() {
-    // Mostrar el mensaje de advertencia utilizando JavaScript y Bootstrap
-    //("#mensajeAdvertencia").show();
 	Swal.fire({
         position: "center",
         icon: "warning",
-        title: "<%= request.getAttribute("advertencia") %>",
+        title: "<%=request.getAttribute("advertencia")%>",
         showConfirmButton: true
     });
 });
@@ -321,15 +316,18 @@ $(function() {
 	</div>
 	<div id="mensajeExito" style="display: none;"
 		class="alert alert-success">Cliente agregado con éxito.</div>
-	<h2>Agregar Cliente</h2>
-	<%
-		Provincia provincia = clienteModificar != null ? clienteModificar.getProvincia() : null;
-	%>
-	<form action="ServletCliente" method="post"
-		onsubmit="return validarCampos();">
-		<input type="hidden" name="idCliente"
-			value="<%=(clienteModificar != null) ? clienteModificar.getIdCliente() : 0%>">
-		<div class="container">
+
+	<div class="container">
+		<h1 class="text-center mt-3 mb-4"><%=(clienteModificar == null || clienteModificar.getIdCliente() == 0)
+					? "Agregar Cliente"
+					: "Modificar Cliente"%></h1>
+		<%
+			Provincia provincia = clienteModificar != null ? clienteModificar.getProvincia() : null;
+		%>
+		<form action="ServletCliente" method="post"
+			onsubmit="return validarCampos();">
+			<input type="hidden" name="idCliente"
+				value="<%=(clienteModificar != null) ? clienteModificar.getIdCliente() : 0%>">
 			<div class="row">
 				<div class="col-md-3">
 					<!-- Columna 1: Datos de Usuario -->
@@ -458,12 +456,12 @@ $(function() {
 				</div>
 
 			</div>
-		</div>
 
-		<a href="ServletCliente?lista=1" class="btn btn-secondary">Volver
-			al Listado</a>
-			<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
-	</form>
+			<a href="ServletCliente?lista=1" class="btn btn-secondary mt-4">Volver
+				al Listado</a> <a class="btn btn-primary  mt-4" href="Inicio.jsp">Volver
+				al Inicio</a>
+		</form>
+	</div>
 
 </body>
 </html>

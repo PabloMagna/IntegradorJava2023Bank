@@ -22,7 +22,7 @@
 </head>
 <body>
 	<div class="container">
-		<h1 class="mt-4">Datos del Cliente</h1>
+		<h1 class="text-center mt-2 mb-4">Información del Cliente</h1>
 		<%
 			HttpSession ses2 = request.getSession(false);
 			Cliente cliente2 = (Cliente) ses.getAttribute("cliente");
@@ -90,7 +90,9 @@
 		<%
 			}
 		%>
-		<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
+		<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
 	</div>
 </body>
 </html>

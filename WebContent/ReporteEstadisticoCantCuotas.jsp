@@ -62,7 +62,7 @@
 									RECHAZADO
 								</option>											
 							</select> 
-							<button type="submit" name="btnFiltrarReporte2" class="btn btn-primary">Filtrar</button>							
+							<button type="submit" name="btnFiltrarReporte2" class="btn btn-success">Filtrar</button>							
 						</div>
 					</div>
 				</form>
@@ -92,5 +92,8 @@
 	 </div>	
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+	<div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
 </body>
 </html>

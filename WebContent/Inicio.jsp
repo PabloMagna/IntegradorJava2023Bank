@@ -5,15 +5,33 @@
 <%@ page import="javax.servlet.http.HttpSession"%>
 <%@include file="Layout.jsp"%>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<%
+    Boolean checkLogin = (Boolean) session.getAttribute("checkLogin");
+    if (checkLogin != null && checkLogin && cliente == null) {
+%>
+<script>
+    Swal.fire({
+        icon: "error",
+        title: "Usuario y/o contraseña incorrectas.",
+        showConfirmButton: true,
+    });
+</script>
+<%
+    }
+    if (checkLogin != null) {
+        session.setAttribute("checkLogin", false);
+    }
+%>
+
+
 <div class="container">
 	<%
 		if (cliente != null) {
 	%>
-	<div class="row mt-5">
-		<div class="col-md-6">
-			<div class="card">
-				<div class="card-body">
-					<h2 class="card-title">
+	<div class="border rounded p-4 mx-auto mt-3" style="max-width: 600px;">
+					<h2 class="card-title mt-5">
 						¡Bienvenido
 						<%=(cliente.getTipoCliente() == TipoCliente.CLIENTE) ? "Cliente" : "Admin"%>!
 					</h2>
@@ -47,8 +65,6 @@
 						%>
 					</ul>
 				</div>
-			</div>
-		</div>
 		<%
 			} else {
 		%>

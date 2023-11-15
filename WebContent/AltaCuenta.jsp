@@ -27,7 +27,7 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <title>Formulario para Cargar una Cuenta</title>
 <style>
 /* Estilo personalizado para centrar el contenido vertical y horizontalmente */
@@ -40,31 +40,29 @@
 </style>
 </head>
 <body>
-	<div class="container">
-		<div>
-			<h1>Formulario para Cargar una Cuenta</h1>
 
-			<!-- Verificar si hay una advertencia -->
-
-			<%
-				String advertencia = (String) request.getAttribute("advertencia");
-				if (advertencia != null) {
-			%>
-			<script>
+	<%
+		String advertencia = (String) request.getAttribute("advertencia");
+		if (advertencia != null) {
+	%>
+	<script>
         Swal.fire({
             icon: "<%=advertencia.equals("exito") ? "success" : "error"%>",
             title: "<%=advertencia.equals("exito") ? "Éxito" : "Error"%>",
             text:"<%=advertencia.equals("exito")
 						? "La cuenta se ha agregado exitosamente."
 						: "El cliente ya posee 3 cuentas."%>",
-            showConfirmButton: false,
-            timer: 3000
-        });
-    </script>
-			<%
-				}
-			%>
+					showConfirmButton : false,
+					timer : 3000
+				});
+	</script>
+	<%
+		}
+	%>
 
+	<div class="container mt-5">
+  <div class="border rounded p-4 mx-auto" style="max-width: 400px;">
+    <h2 class="text-center mt-3 mb-4">Formulario para Cargar una Cuenta</h2>
 
 			<form action="ServletCuenta" method="post">
 				<div class="form-group">
@@ -89,11 +87,13 @@
 					</select>
 				</div>
 
-				<button type="submit" name="btnAgregar" class="btn btn-primary">Agregar
+				<button type="submit" name="btnAgregar" class="btn btn-success mt-3">Agregar
 					Cuenta</button>
-					<a class="btn btn-primary" href="Inicio.jsp">Volver al Inicio</a>
 			</form>
 		</div>
 	</div>
+	<div class="d-flex justify-content-center">
+      <a class="btn btn-primary mt-5" href="Inicio.jsp">Volver al Inicio</a>
+    </div>
 </body>
 </html>

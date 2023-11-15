@@ -22,7 +22,9 @@
                 <h3 class="alert-heading">Necesitas loguearte para ingresar aquí.</h3>
             <% } %>
         </div>
-        <a href="Inicio.jsp" class="btn btn-primary">Volver al inicio</a>
     </div>
+        <div class="d-flex justify-content-center">
+		<a class="btn btn-primary mt-3" href="Inicio.jsp">Volver al Inicio</a>
+	</div>
 </body>
 </html>
