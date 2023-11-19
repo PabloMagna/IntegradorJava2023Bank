@@ -25,6 +25,24 @@
     }
 %>
 
+<%
+    Boolean checkCerrar = (Boolean) session.getAttribute("checkCerrar");
+    if (checkCerrar != null && checkCerrar && cliente == null) {
+%>
+<script>
+    Swal.fire({
+        icon: "info",
+        title: "Se cerró sesión correctamente",
+        showConfirmButton: true,
+    });
+</script>
+<%
+    }
+    if (checkCerrar != null) {
+        session.setAttribute("checkCerrar", false);
+    }
+%>
+
 
 <div class="container">
 	<%
@@ -56,9 +74,9 @@
 								Préstamos Admin</a></li>
 						<li class="list-group-item"><a href="ServletCuenta?lista=1">Listar
 								Cuentas</a></li>
-						<li class="list-group-item"><a href="Informe1.jsp">Informe
+						<li class="list-group-item"><a href="ServletCuenta?informe1=1">Reporte
 								1</a></li>
-						<li class="list-group-item"><a href="Informe2.jsp">Informe
+						<li class="list-group-item"><a href="ServletPrestamo?informe2=1.jsp">Reporte
 								2</a></li>
 						<%
 							}
@@ -81,7 +99,7 @@
 							<label for="password">Contraseña:</label> <input type="password"
 								class="form-control" id="password" name="password" required>
 						</div>
-						<button type="submit" class="btn btn-primary" name="btnLogin">Iniciar
+						<button type="submit" class="btn btn-primary mt-3" name="btnLogin">Iniciar
 							Sesión</button>
 					</form>
 					<p id="message" class="mt-3"></p>

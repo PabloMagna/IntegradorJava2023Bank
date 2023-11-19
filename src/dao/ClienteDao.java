@@ -277,7 +277,7 @@ public class ClienteDao implements IClienteDao {
         } catch (UsuarioExistenteException ex) {
         	System.err.println(ex.getMessage());
         } catch (SQLException e) {
-            System.err.println("Error al verificar si el usuario es único y activo: " + e.getMessage());
+            System.err.println("Error al verificar si el usuario es único: " + e.getMessage());
         }
 
         throw new UsuarioExistenteException();
@@ -285,7 +285,7 @@ public class ClienteDao implements IClienteDao {
     
     @Override
     public int DniUnico(int dni, int idCliente) {
-        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE dni = ? AND activo = 1 AND idCliente <> ?";
+        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE dni = ? AND idCliente <> ?";
         try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
             statement.setInt(1, dni);
             statement.setInt(2, idCliente);
@@ -303,7 +303,7 @@ public class ClienteDao implements IClienteDao {
         } catch(DNIExistenteException ex) {
         	System.err.println(ex.getMessage());
         } catch (SQLException e) {
-            System.err.println("Error al verificar si el DNI es único y activo: " + e.getMessage());
+            System.err.println("Error al verificar si el DNI es único : " + e.getMessage());
         }
 
         throw new DNIExistenteException(); // En caso de error, Exception
@@ -311,7 +311,7 @@ public class ClienteDao implements IClienteDao {
     
     @Override
     public int CuilUnico(String cuil, int idCliente) {
-        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE cuil = ? AND activo = 1 AND idCliente <> ?";
+        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE cuil = ? AND idCliente <> ?";
         try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
             statement.setString(1, cuil);
             statement.setInt(2, idCliente);
@@ -328,7 +328,7 @@ public class ClienteDao implements IClienteDao {
         } catch(CuilExistenteException ex) {
         	System.err.println(ex.getMessage());
         } catch (SQLException e) {
-            System.err.println("Error al verificar si el CUIL es único y activo: " + e.getMessage());
+            System.err.println("Error al verificar si el CUIL es único: " + e.getMessage());
         }
 
         throw new CuilExistenteException();
@@ -336,7 +336,7 @@ public class ClienteDao implements IClienteDao {
     
     @Override
     public int CorreoUnico(String correo, int idCliente) {
-        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE correo = ? AND activo = 1 AND idCliente <> ?";
+        String consulta = "SELECT COUNT(*) AS count FROM CLIENTE WHERE correo = ? AND idCliente <> ?";
         try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
             statement.setString(1, correo);
             statement.setInt(2, idCliente);

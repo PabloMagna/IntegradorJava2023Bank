@@ -27,7 +27,7 @@ public class Conexion {
             try {
                 conexion.close();
             } catch (SQLException e) {
-                System.err.println("Error al cerrar la conexión: " + e.getMessage());
+                System.err.println("Error al cerrar la conexiï¿½n: " + e.getMessage());
             }
         }
     }

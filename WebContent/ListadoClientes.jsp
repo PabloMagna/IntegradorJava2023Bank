@@ -7,8 +7,8 @@
 <%
 	Cliente clienteUsuario = (Cliente) session.getAttribute("cliente");
 
-	if (clienteUsuario == null || clienteUsuario.getTipoCliente() != Cliente.TipoCliente.ADMIN) {
-		response.sendRedirect("Inicio.jsp");
+	if (clienteUsuario == null || clienteUsuario.getTipoCliente() == Cliente.TipoCliente.CLIENTE) {
+		response.sendRedirect("ErrorPermiso.jsp");
 	}
 %>
 <!DOCTYPE html>

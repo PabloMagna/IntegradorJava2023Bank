@@ -14,14 +14,14 @@ CREATE TABLE IF NOT EXISTS TIPOSMOVIMIENTO (
 -- Crear la tabla PROVINCIAS
 CREATE TABLE IF NOT EXISTS PROVINCIAS (
     ID INT PRIMARY KEY,
-    Nombre VARCHAR(30)
+    Nombre VARCHAR(80)
 );
 
 -- Crear la tabla LOCALIDADES
 CREATE TABLE IF NOT EXISTS LOCALIDADES (
     ID INT PRIMARY KEY,
     IDProvincia INT,
-    Nombre VARCHAR(30),
+    Nombre VARCHAR(80),
     FOREIGN KEY (IDProvincia) REFERENCES PROVINCIAS(ID)
 );
 
@@ -2562,49 +2562,191 @@ VALUES ('admin', 'admin', 1, '2023-11-04', 1, '12345678', '203456789012345', 'Ad
 
 -- Cliente 1 (cliente de ejemplo con usuario y contraseña)
 INSERT INTO CLIENTE (usuario, contraseña, activo, fechaCreacion, idTipo, dni, cuil, nombre, apellido, sexo, nacionalidad, fechaNacimiento, direccion, idLocalidad, idProvincia, correo)
-VALUES ('cliente', 'cliente', 1, '2023-11-04', 0, '12435678', '203876789012345', 'Cliente1', 'Apellido1', 0, 'Argentina', '1990-01-01', '123 Calle Principal', 1, 1, 'cliente1@example.com');
+VALUES ('cliente', 'cliente', 1, '2023-11-04', 0, '12435678', '203876789012345', 'Cliente', 'Apellido', 0, 'Argentina', '1990-01-01', '123 Calle Principal', 1, 1, 'cliente1@example.com');
 
--- Cliente 2
-INSERT INTO CLIENTE (usuario, contraseña, activo, fechaCreacion, idTipo, dni, cuil, nombre, apellido, sexo, nacionalidad, fechaNacimiento, direccion, idLocalidad, idProvincia, correo)
-VALUES ('cliente2', 'password2', 1, '2023-11-04', 0, '23456789', '303456789012346', 'Cliente2', 'Apellido2', 0, 'Argentina', '1991-02-02', '456 Calle Secundaria', 2, 1, 'cliente2@example.com');
+use dbintegrador;
 
--- Cliente 3
-INSERT INTO CLIENTE (usuario, contraseña, activo, fechaCreacion, idTipo, dni, cuil, nombre, apellido, sexo, nacionalidad, fechaNacimiento, direccion, idLocalidad, idProvincia, correo)
-VALUES ('cliente3', 'password3', 1, '2023-11-04', 0, '34567890', '403456789012347', 'Cliente3', 'Apellido3', 0, 'Argentina', '1992-03-03', '789 Calle Terciaria', 3, 2, 'cliente3@example.com');
+INSERT INTO cliente (usuario, contraseña, activo, fechaCreacion, idTipo, dni, cuil, nombre, apellido, sexo, nacionalidad, fechaNacimiento, direccion, idLocalidad, idProvincia, correo) VALUES 
+('juan123', 'contraseña123', 1, CURDATE(), 0, '30567890', '20123456789', 'Juan', 'Perez', 1, 'Argentina', '1985-07-12', 'Calle Principal 123', 1, 1, 'juan@example.com'),
+('maria456', 'password456', 1, CURDATE(), 0, '40876543', '23109876543', 'Maria', 'Garcia', 2, 'Mexico', '1990-03-25', 'Avenida Central 456', 2, 2, 'maria@example.com'),
+('alejandro789', 'securepass789', 1, CURDATE(), 0, '28765432', '20456789012', 'Alejandro', 'Rodriguez', 1, 'Espana', '1988-11-05', 'Calle Principal 789', 3, 3, 'alejandro@example.com'),
+('laura123', 'laura_pass', 1, CURDATE(), 0, '37654321', '22123456780', 'Laura', 'Martinez', 2, 'Brasil', '1995-09-18', 'Avenida Principal 234', 4, 4, 'laura@example.com'),
+('diego456', 'diego_pass', 1, CURDATE(), 0, '43210987', '24789012345', 'Diego', 'Lopez', 1, 'Colombia', '1983-12-30', 'Calle Central 345', 5, 5, 'diego@example.com'),
+('sofia789', 'sofia_pass', 1, CURDATE(), 0, '39876543', '25678101234', 'Sofia', 'Fernandez', 2, 'Chile', '1992-06-15', 'Calle de la Paz 456', 6, 6, 'sofia@example.com'),
+('lucas123', 'lucas_pass', 1, CURDATE(), 0, '45658901', '27789012345', 'Lucas', 'Gomez', 1, 'Peru', '1987-04-22', 'Avenida Libertad 567', 7, 1, 'lucas@example.com'),
+('carolina456', 'carolina_pass', 1, CURDATE(), 0, '54321098', '29876543210', 'Carolina', 'Torres', 2, 'Uruguay', '1998-08-07', 'Calle Principal 678', 8, 8, 'carolina@example.com'),
+('matias789', 'matias_pass', 1, CURDATE(), 0, '65432109', '23123456789', 'Matias', 'Sanchez', 1, 'Ecuador', '1991-10-11', 'Calle de los Suenos 789', 9, 9, 'matias@example.com'),
+('valentina123', 'valentina_pass', 1, CURDATE(), 0, '76543210', '21456789012', 'Valentina', 'Diaz', 2, 'Venezuela', '1984-02-28', 'Avenida Bella Vista 890', 10, 1, 'valentina@example.com'),
+('facundo456', 'facundo_pass', 1, CURDATE(), 0, '87654321', '23567890123', 'Facundo', 'Ramirez', 1, 'Estados Unidos', '1986-11-14', 'Calle de la Esperanza 901', 11, 9, 'facundo@example.com'),
+('julieta789', 'julieta_pass', 1, CURDATE(), 0, '98765432', '25678901234', 'Julieta', 'Alonso', 2, 'Italia', '1993-05-20', 'Calle del Sol 123', 12, 1, 'julieta@example.com'),
+('gabriel123', 'gabriel_pass', 1, CURDATE(), 0, '10987654', '27890123456', 'Gabriel', 'Herrera', 1, 'Francia', '1989-07-03', 'Avenida Central 234', 13, 13, 'gabriel@example.com'),
+('florencia456', 'florencia_pass', 1, CURDATE(), 0, '21098765', '29123456789', 'Florencia', 'Castro', 2, 'Australia', '1996-04-09', 'Calle de la Luna 345', 14, 14, 'florencia@example.com'),
+('martin789', 'martin_pass', 1, CURDATE(), 0, '32109876', '21234567890', 'Martin', 'Ruiz', 1, 'Alemania', '1980-09-26', 'Calle Principal 567', 15, 15, 'martin@example.com');
 
--- Cliente 4
-INSERT INTO CLIENTE (usuario, contraseña, activo, fechaCreacion, idTipo, dni, cuil, nombre, apellido, sexo, nacionalidad, fechaNacimiento, direccion, idLocalidad, idProvincia, correo)
-VALUES ('cliente4', 'password4', 1, '2023-11-04', 0, '45678901', '503456789012348', 'Cliente4', 'Apellido4', 0, 'Argentina', '1993-04-04', '1011 Calle Cuarta', 1, 2, 'cliente4@example.com');
+-- Teléfonos para el usuario con idCliente = 3 (Juan Pérez)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(3, '1234567890', 1),
+(3, '9876543210', 1),
+(3, '1112223330', 1);
 
--- Cliente 5
-INSERT INTO CLIENTE (usuario, contraseña, activo, fechaCreacion, idTipo, dni, cuil, nombre, apellido, sexo, nacionalidad, fechaNacimiento, direccion, idLocalidad, idProvincia, correo)
-VALUES ('cliente5', 'password5', 1, '2023-11-04', 0, '56789012', '603456789012349', 'Cliente5', 'Apellido5', 0, 'Argentina', '1994-05-05', '1212 Calle Quinta', 2, 2, 'cliente5@example.com');
+-- Teléfonos para el usuario con idCliente = 4 (María García)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(4, '5555555555', 1),
+(4, '7777777777', 1),
+(4, '9999999999', 1);
 
--- Cliente 6
-INSERT INTO CLIENTE (usuario, contraseña, activo, fechaCreacion, idTipo, dni, cuil, nombre, apellido, sexo, nacionalidad, fechaNacimiento, direccion, idLocalidad, idProvincia, correo)
-VALUES ('cliente6', 'password6', 1, '2023-11-04', 0, '67890123', '703456789012350', 'Cliente6', 'Apellido6', 0, 'Argentina', '1995-06-06', '1414 Calle Sexta', 3, 1, 'cliente6@example.com');
+-- Teléfonos para el usuario con idCliente = 5 (Alejandro Rodríguez)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(5, '4444444444', 1),
+(5, '6666666666', 1),
+(5, '8888888888', 1);
 
--- Cliente 2
-INSERT INTO telefonos (idCliente, numero, activo)
-VALUES (2, '555-123-4567', 1);
--- Cliente 2
-INSERT INTO telefonos (idCliente, numero, activo)
-VALUES (2, '555-253-4567', 1);
+-- Teléfonos para el usuario con idCliente = 6 (Laura Martínez)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(6, '1010101010', 1),
+(6, '1212121212', 1),
+(6, '1313131313', 1);
+
+-- Teléfonos para el usuario con idCliente = 7 (Diego López)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(7, '1515151515', 1),
+(7, '1616161616', 1),
+(7, '1717171717', 1);
+
+-- Teléfonos para el usuario con idCliente = 8 (Sofía Fernández)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(8, '1818181818', 1),
+(8, '1919191919', 1),
+(8, '2020202020', 1);
+
+-- Teléfonos para el usuario con idCliente = 9 (Lucas Gómez)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(9, '2121212121', 1),
+(9, '2222222222', 1),
+(9, '2323232323', 1);
+
+-- Teléfonos para el usuario con idCliente = 10 (Carolina Torres)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(10, '2424242424', 1),
+(10, '2525252525', 1),
+(10, '2626262626', 1);
+
+-- Teléfonos para el usuario con idCliente = 11 (Matías Sánchez)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(11, '2727272727', 1),
+(11, '2828282828', 1),
+(11, '2929292929', 1);
+
+-- Teléfonos para el usuario con idCliente = 12 (Valentina Díaz)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(12, '3030303030', 1),
+(12, '3131313131', 1),
+(12, '3232323232', 1);
+
+-- Teléfonos para el usuario con idCliente = 13 (Facundo Ramírez)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(13, '3333333333', 1),
+(13, '3434343434', 1),
+(13, '3535353535', 1);
+
+-- Teléfonos para el usuario con idCliente = 14 (Julieta Alonso)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(14, '3636363636', 1),
+(14, '3737373737', 1),
+(14, '3838383838', 1);
+
+-- Teléfonos para el usuario con idCliente = 15 (Gabriel Herrera)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(15, '3939393939', 1),
+(15, '4040404040', 1),
+(15, '4141414141', 1);
+
+-- Teléfonos para el usuario con idCliente = 16 (Florencia Castro)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(16, '4242424242', 1),
+(16, '4343434343', 1),
+(16, '4444444444', 1);
+
+-- Teléfonos para el usuario con idCliente = 17 (Martín Ruiz)
+INSERT INTO telefonos (idCliente, numero, activo) VALUES 
+(17, '4545454545', 1),
+(17, '4646464646', 1),
+(17, '4747474747', 1);
 
 
--- Cliente 3
-INSERT INTO telefonos (idCliente, numero, activo)
-VALUES (3, '555-987-6543', 1);
+-- CUENTAS
 
--- Cliente 4
-INSERT INTO telefonos (idCliente, numero, activo)
-VALUES (4, '555-555-5555', 1);
+-- Cuentas para el cliente con idCliente = 3 (Juan Pérez)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(3, '1234567890123456789012', 10000.00, '2021-04-15', 1, 1),
+(3, '9876543210987654321098', 10000.00, '2022-07-25', 1, 1);
 
--- Cliente 5
-INSERT INTO telefonos (idCliente, numero, activo)
-VALUES (5, '555-111-2222', 1);
+-- Cuentas para el cliente con idCliente = 4 (María García)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(4, '5555555555555555555555', 10000.00, '2021-09-05', 1, 1),
+(4, '7777777777777777777777', 10000.00, '2023-01-10', 1, 1);
 
--- Cliente 6
-INSERT INTO telefonos (idCliente, numero, activo)
-VALUES (6, '555-999-8888', 1);
+-- Cuentas para el cliente con idCliente = 5 (Alejandro Rodríguez)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(5, '4444444444444444444444', 10000.00, '2022-11-18', 1, 1),
+(5, '6666666666666666666666', 10000.00, '2023-06-22', 1, 1);
 
+-- Cuentas para el cliente con idCliente = 6 (Laura Martínez)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(6, '1010101010101010101010', 10000.00, '2021-12-30', 1, 1),
+(6, '1212121212121212121212', 10000.00, '2022-08-05', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 7 (Diego López)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(7, '1515151515151515151515', 10000.00, '2022-03-14', 1, 1),
+(7, '1616161616161616161616', 10000.00, '2023-09-28', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 8 (Sofía Fernández)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(8, '1818181818181818181818', 10000.00, '2023-05-20', 1, 1),
+(8, '1919191919191919191919', 10000.00, '2021-08-12', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 9 (Lucas Gómez)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(9, '2020202020202020202020', 10000.00, '2021-10-28', 1, 1),
+(9, '2121212121212121212121', 10000.00, '2022-06-07', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 10 (Carolina Torres)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(10, '2222222222222222222222', 10000.00, '2023-02-17', 1, 1),
+(10, '2323232323232323232323', 10000.00, '2022-09-23', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 11 (Matías Sánchez)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(11, '2424242424242424242424', 10000.00, '2021-07-09', 1, 1),
+(11, '2525252525252525252525', 10000.00, '2022-04-26', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 12 (Valentina Díaz)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(12, '2626262626262626262626', 10000.00, '2023-01-01', 1, 1),
+(12, '2727272727272727272727', 10000.00, '2022-11-11', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 13 (Facundo Ramírez)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(13, '2828282828282828282828', 10000.00, '2022-05-30', 1, 1),
+(13, '2929292929292929292929', 10000.00, '2021-09-15', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 14 (Julieta Alonso)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(14, '3030303030303030303030', 10000.00, '2021-03-05', 1, 1),
+(14, '3131313131313131313131', 10000.00, '2022-10-19', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 15 (Gabriel Herrera)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(15, '3232323232323232323232', 10000.00, '2022-12-24', 1, 1),
+(15, '3333333333333333333333', 10000.00, '2023-08-02', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 16 (Florencia Castro)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(16, '3434343434343434343434', 10000.00, '2023-04-14', 1, 1),
+(16, '3535353535353535353535', 10000.00, '2021-06-28', 1, 1);
+
+-- Cuentas para el cliente con idCliente = 17 (Martín Ruiz)
+INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
+(17, '3636363636363636363636', 10000.00, '2021-01-20', 1, 1),
+(17, '3737373737373737373737', 10000.00, '2022-03-11', 1, 1);

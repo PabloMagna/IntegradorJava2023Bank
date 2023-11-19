@@ -14,12 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import entidad.Cliente;
-import entidad.Cuenta;
 import entidad.Localidad;
 import entidad.Provincia;
 import entidad.Telefono;
 import negocio.ClienteNegocio;
-import negocio.CuentaNegocio;
 import negocio.LocalidadNegocio;
 import negocio.ProvinciaNegocio;
 import negocio.TelefonoNegocio;
@@ -39,109 +37,35 @@ public class ServletCliente extends HttpServlet {
 			throws ServletException, IOException {
 		ClienteNegocio clienteNegocio = new ClienteNegocio();
 
-		if (request.getParameter("login") != null) {
+		if (request.getParameter("login") != null) 
+			CheckLogin(request, response);
+		
+		if (request.getParameter("logout") != null) 
+			Logout(request, response);
 
-			HttpSession sesion = request.getSession(false);
-			if (sesion != null) {
-				sesion.setAttribute("checkLogin", true);
-				response.sendRedirect("Inicio.jsp");
-				return;
-			}
-		}
+		// ALTA (AltaCliente.jsp)
+		if (request.getParameter("alta") != null)
+			Alta(request, response);
 
-		// ALTA CLIENTE
-		if (request.getParameter("alta") != null) {
-			HttpSession session = request.getSession();
-			session.removeAttribute("clienteDatos");
-			CargarDescolgables(request, response);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
-			dispatcher.forward(request, response);
-		}
+		// LISTA DE CLIENTES (ListadoClientes.jsp)
+		if (request.getParameter("lista") != null) 
+			ListaClientes(request, response);
+		
+		// ELIMINAR CLIENTE (ListadoClientes.jsp)
+		if (request.getParameter("ElimId") != null) 
+			EliminarCliente(request, response, clienteNegocio);
 
-		if (request.getParameter("lista") != null) {
+		// BUSCAR CLIENTE (ListadoClientes.jsp)
+		if (request.getParameter("btnBusqueda") != null) 
+			BuscarCliente(request, response, clienteNegocio);
 
-			CargarListaClientes(request, response);
+		// FILTRAR LISTA DE CLIENTES (ListadoClientes.jsp)
+		if (request.getParameter("btnFiltrar") != null) 
+			FiltrarListado(request, response, clienteNegocio);
 
-			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
-			dispatcher.forward(request, response);
-		}
-		if (request.getParameter("ElimId") != null) {
-			int clienteId = Integer.parseInt(request.getParameter("ElimId"));
-			boolean filasEliminadas = clienteNegocio.EliminarCliente(clienteId);
-
-			if (filasEliminadas) {
-				request.setAttribute("exitoEliminacionCliente", true);
-
-				CargarListaClientes(request, response);
-
-				RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
-				dispatcher.forward(request, response);
-			} else {
-
-				response.sendRedirect("Error.jsp");
-			}
-		}
-
-		// BUSCAR
-		if (request.getParameter("btnBusqueda") != null) {
-			String busqueda = request.getParameter("busqueda");
-
-			ArrayList<Cliente> lista = clienteNegocio.ListarClientesActivos(busqueda);
-
-			request.setAttribute("lista", lista);
-			ArrayList<Telefono> listaTelefonos = telefonoNegocio.ListarTelefonoPorIdCliente(0);// lista todos
-			request.setAttribute("listaTelefonos", listaTelefonos);
-
-			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
-			dispatcher.forward(request, response);
-		}
-
-		// FILTRAR
-		if (request.getParameter("btnFiltrar") != null) {
-			String tipoFiltro = request.getParameter("operadorEdad");
-			String numeroFiltroStr = request.getParameter("edad");
-			int numeroFiltro = (numeroFiltroStr != null && !numeroFiltroStr.isEmpty())
-					? Integer.parseInt(numeroFiltroStr)
-					: 0;
-			String busqueda = request.getParameter("busqueda");
-
-			ArrayList<Cliente> lista = clienteNegocio.ListarClientesActivos(busqueda);
-			lista = clienteNegocio.filtrarLista(lista, tipoFiltro, numeroFiltro);
-
-			ArrayList<Telefono> listaTelefonos = telefonoNegocio.ListarTelefonoPorIdCliente(0);// lista todos
-			request.setAttribute("listaTelefonos", listaTelefonos);
-
-			request.setAttribute("lista", lista);
-
-			request.setAttribute("operadorEdad", tipoFiltro);
-			request.setAttribute("busqueda", busqueda);
-			request.setAttribute("edad", numeroFiltro);
-
-			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
-			dispatcher.forward(request, response);
-		}
-
+		// MODIF ID (ListadoClientes.jsp)
 		if (request.getParameter("ModifId") != null) {
-			int modifId = Integer.parseInt(request.getParameter("ModifId"));
-			clienteNegocio = new ClienteNegocio();
-			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(modifId);
-			request.setAttribute("telefonos", telefonos);
-
-			CargarDescolgables(request, response);
-
-			Cliente cliente = clienteNegocio.ObtenerPorIdCliente(modifId);
-
-			if (cliente != null) {
-				HttpSession session = request.getSession();
-				session.setAttribute("clienteDatos", cliente);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
-				dispatcher.forward(request, response);
-			}
+			ModifId(request, response, clienteNegocio);
 		}
 
 	}
@@ -149,217 +73,357 @@ public class ServletCliente extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		ClienteNegocio clienteNegocio = new ClienteNegocio();
-		// LOGIN
-		if (request.getParameter("btnLogin") != null) {
-			String usuario = request.getParameter("username");
-			String contrasenia = request.getParameter("password");
-			Cliente cliente = clienteNegocio.Login(usuario, contrasenia);
-			if (cliente != null) {
-				sesion = request.getSession();
-				sesion.setAttribute("cliente", cliente);
-				response.sendRedirect("Inicio.jsp");
-			} else {
-				response.sendRedirect("ServletCliente?login=1");
-			}
-		}
-		if (request.getParameter("btnCerrarSesion") != null) {
-			HttpSession sesion = request.getSession(false);
-			if (sesion != null) {
-				sesion.invalidate();
-			}
+		
+		// LOGIN (Inicio.jsp)
+		if (request.getParameter("btnLogin") != null) 
+			Login(request, response, clienteNegocio);
+		
+		// CERRAR SESION (Layout.jsp)
+		if (request.getParameter("btnCerrarSesion") != null) 
+			CerrarSesion(request, response, clienteNegocio);
 
-			response.sendRedirect("Inicio.jsp");
-		}
+		// GUARDAR CLIENTE (AltaCliente.jsp)
+		if (request.getParameter("btnGuardar") != null)
+			GuardarCliente(request, response, clienteNegocio);
 
-		// ALTA CLIENTE
-		if (request.getParameter("btnGuardar") != null) {
-
-			Cliente cliente = obtenerClienteDesdeRequest(request);
-			HttpSession session = request.getSession();
-			session.setAttribute("clienteDatos", cliente);
-
-			if (!clienteNegocio.DniUnico(cliente.getDni(), 0)) {
-				cliente.setIdCliente(0);
-
-				request.setAttribute("advertencia", "DNI existente en registros!");
-
-				session.setAttribute("clienteDatos", cliente);
-
-				CargarDescolgables(request, response);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
-				dispatcher.forward(request, response);
-				return;
-			}
-			if (!clienteNegocio.UsuarioUnico(cliente.getUsuario())) {
-				cliente.setIdCliente(0);
-				cliente.setUsuario("");
-
-				request.setAttribute("advertencia", "Nombre de usuario en uso, elegí otro!");
-
-				session.setAttribute("clienteDatos", cliente);
-
-				CargarDescolgables(request, response);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
-				dispatcher.forward(request, response);
-				return;
-			}
-			if (!clienteNegocio.CuilUnico(cliente.getCuil(), 0)) {
-				cliente.setIdCliente(0);
-				cliente.setCuil("");
-
-				request.setAttribute("advertencia", "Cuil existente en registros!");
-
-				session.setAttribute("clienteDatos", cliente);
-
-				CargarDescolgables(request, response);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
-				dispatcher.forward(request, response);
-				return;
-			}
-			if (!clienteNegocio.CorreoUnico(cliente.getCorreo(), 0)) {
-				cliente.setIdCliente(0);
-				cliente.setCorreo("");
-
-				request.setAttribute("advertencia", "Correo existente, elegí otro!");
-
-				session.setAttribute("clienteDatos", cliente);
-
-				CargarDescolgables(request, response);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
-				dispatcher.forward(request, response);
-				return;
-			}
-
-			int idCliente = clienteNegocio.Agregar(cliente);
-
-			if (idCliente > 0) {
-				TelefonoNegocio telefonoNegocio = new TelefonoNegocio();
-				String[] telefonos = request.getParameterValues("telefonos");
-				if (telefonos != null)
-					telefonoNegocio.AgregarTelefonos(idCliente, telefonos);
-				else {
-					telefonoNegocio.AgregarTelefonos(idCliente, null); // solo los borra
-				}
-				CargarDescolgables(request, response);
-				// Redirige al ServletCliente con parámetros "Alta=1" y "exito=true"
-				response.sendRedirect(request.getContextPath() + "/ServletCliente?alta=1&exito=true");
-			}
-		}
-
-		// Modificacion de cliente
-		if (request.getParameter("btnModificar") != null) {
-			int clienteId = Integer.parseInt(request.getParameter("idCliente"));
-			Cliente cliente = obtenerClienteDesdeRequest(request);
-			HttpSession session = request.getSession();
-			session.setAttribute("clienteDatos", cliente);
-			cliente.setIdCliente(clienteId);
-
-			if (!clienteNegocio.DniUnico(cliente.getDni(), cliente.getIdCliente())) {
-				request.setAttribute("advertencia", "DNI existente en registros!");
-
-				session.setAttribute("clienteDatos", cliente);
-
-				CargarDescolgables(request, response);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
-				request.setAttribute("telefonos", telefonos);
-
-				RequestDispatcher dispatcher = request
-						.getRequestDispatcher("AltaCliente.jsp?ModifId=" + cliente.getIdCliente());
-				dispatcher.forward(request, response);
-				return;
-			}
-			if (!clienteNegocio.CuilUnico(cliente.getCuil(), cliente.getIdCliente())) {
-				cliente.setCuil("");
-
-				request.setAttribute("advertencia", "Cuil existente en registros!");
-
-				session.setAttribute("clienteDatos", cliente);
-
-				CargarDescolgables(request, response);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
-				request.setAttribute("telefonos", telefonos);
-
-				RequestDispatcher dispatcher = request
-						.getRequestDispatcher("AltaCliente.jsp?ModifId=" + cliente.getIdCliente());
-				dispatcher.forward(request, response);
-				return;
-			}
-			if (!clienteNegocio.CorreoUnico(cliente.getCorreo(), cliente.getIdCliente())) {
-				cliente.setCorreo("");
-
-				request.setAttribute("advertencia", "Correo existente, elegí otro!");
-
-				session.setAttribute("clienteDatos", cliente);
-
-				CargarDescolgables(request, response);
-
-				LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
-				String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				request.setAttribute("fechaNacimiento", fechaNacimientoString);
-
-				ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
-				request.setAttribute("telefonos", telefonos);
-
-				RequestDispatcher dispatcher = request
-						.getRequestDispatcher("AltaCliente.jsp?ModifId=" + cliente.getIdCliente());
-				dispatcher.forward(request, response);
-				return;
-			}
-
-			boolean exitoCliente = clienteNegocio.ModificarCliente(cliente);
-
-			if (exitoCliente) {
-				TelefonoNegocio telefonoNegocio = new TelefonoNegocio();
-				String[] telefonos = request.getParameterValues("telefonos");
-				if (telefonos != null)
-					telefonoNegocio.AgregarTelefonos(clienteId, telefonos);
-				else {
-					telefonoNegocio.AgregarTelefonos(clienteId, null); // solo los borra
-				}
-				request.setAttribute("exitoModificacion", true);
-
-				CargarListaClientes(request, response);
-
-				RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
-				dispatcher.forward(request, response);
-
-			} else {
-				response.sendRedirect("Error.jsp");
-			}
-		}
+		// MODIFICAR CLIENTE (AltaCliente.jsp)
+		if (request.getParameter("btnModificar") != null) 
+			ModificarCliente(request, response, clienteNegocio);
 
 	}
+	
+	
+	// ************** METODOS DO GET *********************************************************************************************
+	// Check Datos Login
+	private void CheckLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		HttpSession sesion = request.getSession(false);
+		if (sesion != null) {
+			sesion.setAttribute("checkLogin", true);
+			response.sendRedirect("Inicio.jsp");
+			return;
+		}
+	}
+	
+	// LOGOUT 
+	private void Logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		 sesion.setAttribute("checkCerrar", true);
+		 response.sendRedirect("Inicio.jsp"); 
+	}
+	
+	// ALTA CLIENTE (AltaCliente.jsp)
+	private void Alta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		session.removeAttribute("clienteDatos");
+		CargarDescolgables(request, response);
+		RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
+		dispatcher.forward(request, response);
+	}
+	
+	// LISTA CLIENTES (ListadoClientes.jsp)
+	private void ListaClientes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		CargarListaClientes(request, response);
+		RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
+		dispatcher.forward(request, response);
+	}
+	
+	// BUSCAR CLIENTE (ListadoClientes.jsp)
+	private void BuscarCliente(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws ServletException, IOException {
+		String busqueda = request.getParameter("busqueda");
+		ArrayList<Cliente> lista = clienteNegocio.ListarClientesActivos(busqueda);
+		
+		request.setAttribute("lista", lista);
+		ArrayList<Telefono> listaTelefonos = telefonoNegocio.ListarTelefonoPorIdCliente(0);// lista todos
+		request.setAttribute("listaTelefonos", listaTelefonos);
 
+		RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
+		dispatcher.forward(request, response);
+	}
+	
+	// FILTRAR LISTADO (ListadoClientes.jsp)
+	private void FiltrarListado(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws ServletException, IOException {
+		String tipoFiltro = request.getParameter("operadorEdad");
+		String numeroFiltroStr = request.getParameter("edad");
+		int numeroFiltro = (numeroFiltroStr != null && !numeroFiltroStr.isEmpty())
+				? Integer.parseInt(numeroFiltroStr)
+				: 0;
+		String busqueda = request.getParameter("busqueda");
+
+		ArrayList<Cliente> lista = clienteNegocio.ListarClientesActivos(busqueda);
+		lista = clienteNegocio.filtrarLista(lista, tipoFiltro, numeroFiltro);
+
+		ArrayList<Telefono> listaTelefonos = telefonoNegocio.ListarTelefonoPorIdCliente(0);// lista todos
+		request.setAttribute("listaTelefonos", listaTelefonos);
+
+		request.setAttribute("lista", lista);
+
+		request.setAttribute("operadorEdad", tipoFiltro);
+		request.setAttribute("busqueda", busqueda);
+		request.setAttribute("edad", numeroFiltro);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
+		dispatcher.forward(request, response);
+	}
+	
+	// ELIMINAR CLIENTE (ListadoClientes.jsp)
+	private void EliminarCliente(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws ServletException, IOException {
+		int clienteId = Integer.parseInt(request.getParameter("ElimId"));
+		boolean filasEliminadas = clienteNegocio.EliminarCliente(clienteId);
+
+		if (filasEliminadas) {
+			request.setAttribute("exitoEliminacionCliente", true);
+			CargarListaClientes(request, response);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
+			dispatcher.forward(request, response);
+		} else {
+			response.sendRedirect("Error.jsp");
+		}
+	}
+	
+	// MODIF ID (ListadoClientes.jsp)
+	private void ModifId(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws ServletException, IOException {
+		int modifId = Integer.parseInt(request.getParameter("ModifId"));
+		ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(modifId);
+		request.setAttribute("telefonos", telefonos);
+
+		CargarDescolgables(request, response);
+
+		Cliente cliente = clienteNegocio.ObtenerPorIdCliente(modifId);
+
+		if (cliente != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("clienteDatos", cliente);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
+			dispatcher.forward(request, response);
+		}
+	}
+	
+
+	// ************** METODOS DO POST *********************************************************************************************
+	
+	// LOGIN (Inicio.jsp)
+	private void Login(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws IOException {
+		String usuario = request.getParameter("username");
+		String contrasenia = request.getParameter("password");
+		Cliente cliente = clienteNegocio.Login(usuario, contrasenia);
+		if (cliente != null) {
+			sesion = request.getSession();
+			sesion.setAttribute("cliente", cliente);
+			response.sendRedirect("Inicio.jsp");
+		} else {
+			response.sendRedirect("ServletCliente?login=1");
+		}
+		
+	}
+	
+	// CERRAR SESION (Layout.jsp)
+	private void CerrarSesion(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws IOException {
+	    HttpSession session = request.getSession(false); 
+	    if (session != null) {
+	        session.invalidate(); 
+	        session = request.getSession(); 
+	        session.setAttribute("checkCerrar", true); 
+	    }
+	    response.sendRedirect("Inicio.jsp?logout=1");  
+	}
+	
+	// MODIFICAR CLIENTE (AltaCliente.jsp)
+	private void ModificarCliente(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws IOException, ServletException {
+		int clienteId = Integer.parseInt(request.getParameter("idCliente"));
+		Cliente cliente = obtenerClienteDesdeRequest(request);
+		HttpSession session = request.getSession();
+		session.setAttribute("clienteDatos", cliente);
+		cliente.setIdCliente(clienteId);
+
+		if (!clienteNegocio.DniUnico(cliente.getDni(), cliente.getIdCliente())) {
+			request.setAttribute("advertencia", "DNI existente en registros!");
+
+			session.setAttribute("clienteDatos", cliente);
+
+			CargarDescolgables(request, response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+			request.setAttribute("telefonos", telefonos);
+
+			RequestDispatcher dispatcher = request
+					.getRequestDispatcher("AltaCliente.jsp?ModifId=" + cliente.getIdCliente());
+			dispatcher.forward(request, response);
+			return;
+		}
+		if (!clienteNegocio.CuilUnico(cliente.getCuil(), cliente.getIdCliente())) {
+			cliente.setCuil("");
+
+			request.setAttribute("advertencia", "Cuil existente en registros!");
+
+			session.setAttribute("clienteDatos", cliente);
+
+			CargarDescolgables(request, response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+			request.setAttribute("telefonos", telefonos);
+
+			RequestDispatcher dispatcher = request
+					.getRequestDispatcher("AltaCliente.jsp?ModifId=" + cliente.getIdCliente());
+			dispatcher.forward(request, response);
+			return;
+		}
+		if (!clienteNegocio.CorreoUnico(cliente.getCorreo(), cliente.getIdCliente())) {
+			cliente.setCorreo("");
+
+			request.setAttribute("advertencia", "Correo existente, elegí otro!");
+
+			session.setAttribute("clienteDatos", cliente);
+
+			CargarDescolgables(request, response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			ArrayList<Telefono> telefonos = telefonoNegocio.ListarTelefonoPorIdCliente(cliente.getIdCliente());
+			request.setAttribute("telefonos", telefonos);
+
+			RequestDispatcher dispatcher = request
+					.getRequestDispatcher("AltaCliente.jsp?ModifId=" + cliente.getIdCliente());
+			dispatcher.forward(request, response);
+			return;
+		}
+
+		boolean exitoCliente = clienteNegocio.ModificarCliente(cliente);
+
+		if (exitoCliente) {
+			TelefonoNegocio telefonoNegocio = new TelefonoNegocio();
+			String[] telefonos = request.getParameterValues("telefonos");
+			if (telefonos != null)
+				telefonoNegocio.AgregarTelefonos(clienteId, telefonos);
+			else {
+				telefonoNegocio.AgregarTelefonos(clienteId, null); // solo los borra
+			}
+			request.setAttribute("exitoModificacion", true);
+
+			CargarListaClientes(request, response);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
+			dispatcher.forward(request, response);
+
+		} else {
+			response.sendRedirect("Error.jsp");
+		}
+	}
+	
+	// GUARDAR CLIENTE (AltaCliente.jsp)
+	private void GuardarCliente(HttpServletRequest request, HttpServletResponse response, ClienteNegocio clienteNegocio) throws ServletException, IOException {
+
+		Cliente cliente = obtenerClienteDesdeRequest(request);
+		HttpSession session = request.getSession();
+		session.setAttribute("clienteDatos", cliente);
+
+		if (!clienteNegocio.DniUnico(cliente.getDni(), 0)) {
+			cliente.setIdCliente(0);
+			request.setAttribute("advertencia", "DNI existente en registros!");
+			session.setAttribute("clienteDatos", cliente);
+
+			CargarDescolgables(request, response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
+			dispatcher.forward(request, response);
+			return;
+		}
+		
+		if (!clienteNegocio.UsuarioUnico(cliente.getUsuario())) {
+			cliente.setIdCliente(0);
+			cliente.setUsuario("");
+
+			request.setAttribute("advertencia", "Nombre de usuario en uso, elegí otro!");
+
+			session.setAttribute("clienteDatos", cliente);
+
+			CargarDescolgables(request, response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
+			dispatcher.forward(request, response);
+			return;
+		}
+		
+		if (!clienteNegocio.CuilUnico(cliente.getCuil(), 0)) {
+			cliente.setIdCliente(0);
+			cliente.setCuil("");
+
+			request.setAttribute("advertencia", "Cuil existente en registros!");
+
+			session.setAttribute("clienteDatos", cliente);
+
+			CargarDescolgables(request, response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
+			dispatcher.forward(request, response);
+			return;
+		}
+		
+		if (!clienteNegocio.CorreoUnico(cliente.getCorreo(), 0)) {
+			cliente.setIdCliente(0);
+			cliente.setCorreo("");
+
+			request.setAttribute("advertencia", "Correo existente, elegí otro!");
+
+			session.setAttribute("clienteDatos", cliente);
+
+			CargarDescolgables(request, response);
+
+			LocalDate fechaNacimientoCliente = cliente.getFechaNacimiento();
+			String fechaNacimientoString = fechaNacimientoCliente.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			request.setAttribute("fechaNacimiento", fechaNacimientoString);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("AltaCliente.jsp");
+			dispatcher.forward(request, response);
+			return;
+		}
+
+		int idCliente = clienteNegocio.Agregar(cliente);
+
+		if (idCliente > 0) {
+			TelefonoNegocio telefonoNegocio = new TelefonoNegocio();
+			String[] telefonos = request.getParameterValues("telefonos");
+			if (telefonos != null)
+				telefonoNegocio.AgregarTelefonos(idCliente, telefonos);
+			else {
+				telefonoNegocio.AgregarTelefonos(idCliente, null); // solo los borra
+			}
+			CargarDescolgables(request, response);
+			// Redirige al ServletCliente con parámetros "Alta=1" y "exito=true"
+			response.sendRedirect(request.getContextPath() + "/ServletCliente?alta=1&exito=true");
+		}
+	}
+	
+	
+	
+	
+	
 	// METODOS
 
 	private void CargarListaClientes(HttpServletRequest request, HttpServletResponse response) {
