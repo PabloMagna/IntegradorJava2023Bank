@@ -9,12 +9,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<link rel="stylesheet"
-	href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Reporte estadistico 1</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Reporte estadistico 1</title>
 </head>
 <body>
 	<%
@@ -107,21 +106,61 @@
 				<%
 					int anioPasado = LocalDate.now().getYear() - 1;
 				%>
-				<div id="divAnioActual">
-					<h2><%=anioActual%></h2>
-					<h3 id="cantidadActual"><%=AltasCuentasAnioActual%>
-						Altas de Cuentas
-					</h3>
-				</div>
-				<div id="divAnioAnterior">
-					<h2><%=anioPasado%></h2>
-					<h3 id="cantidadAnterior"><%=AltasCuentasAnioPasado%>
-						Altas de Cuentas
-					</h3>
-				</div>
+				
+				
+				
+				<div class="container text-center">
+				  <div class="row">
+				    <div class="col">
+				       <div id="divAnioActual" class="divAnioReporte1">
+				       		<h4>Año</h4>
+							<h2><%=anioActual%></h2>							
+							<h4>Altas de Cuentas</h4>
+							<h3 id="cantidadActual"><%=AltasCuentasAnioActual%> </h3>
+						</div>
+						<div id="divAnioAnterior" class="divAnioReporte1">
+							<h4>Año</h4>
+							<h2><%=anioPasado%></h2>							
+							<h4>Altas de Cuentas</h4>
+							<h3 id="cantidadAnterior"><%=AltasCuentasAnioPasado%> </h3>
+						</div>
+				    </div>
+				    	<div class="col">
+						    <div style="width: 380px" id="piechart">
+								<canvas id="grafica"></canvas>
+							</div>
+						</div>
+				    </div>			    
+				  </div>
+				</div>			
+				
 			</div>
 		</div>
 	</div>
+	
+	
+	<script>
+		const labels = ['Año actual', 'Año pasado']
+		const colors = ['rgb(69,177,223)', 'rgb(99,201,122)'];
+	
+		const graph = document.querySelector("#grafica");
+	
+		const data = {
+		    labels: labels,
+		    datasets: [{
+		        data: [<%=AltasCuentasAnioActual%>, <%=AltasCuentasAnioPasado%>],
+		        backgroundColor: colors
+		    }]
+		};
+	
+		const config = {
+		    type: 'pie',
+		    data: data,
+		};
+	
+		new Chart(graph, config);
+    </script>
+	
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
 	<div class="d-flex justify-content-center">

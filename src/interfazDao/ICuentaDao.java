@@ -16,4 +16,5 @@ public interface ICuentaDao {
 	public Cuenta ObtenerPorNumeroCuenta(int numero);
 	public Cuenta ObtenerPorCbu(String cbu);
 	public int CantidadCuentasEstadisticaUno(int anio, int mes);
+	public int EliminarCuentasPorIdCliente(int idCliente);
 }

@@ -76,12 +76,17 @@ body{
 			border-radius: 0.4rem;
 			margin: 5px;
 		}
+		
+		.divAnioReporte1{
+			padding:10px 15px !important;
+		}
+		
 		#cuadroReporte2{
 			width: 100%;
 			margin: auto;
 		}
 		#piechart{
-			float: right;			
+			margin-left: 30px;			
 		}
 		
 

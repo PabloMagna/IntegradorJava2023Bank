@@ -24,9 +24,8 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 
 	@Override
 	public boolean PedirPrestamo(Prestamo prestamo) {
-		return dao.PedirPrestamo(prestamo) == 0? false : true;
+		return dao.PedirPrestamo(prestamo) == 0 ? false : true;
 	}
-
 
 	@Override
 	public boolean CambiarEstadoPrestamo(int idPrestamo, Estado estado) {
@@ -42,36 +41,42 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 	public ArrayList<Prestamo> ListarPorClienteAprobados(int idCliente) {
 		return dao.ListarPorClienteAprobados(idCliente);
 	}
+
 	public ArrayList<Prestamo> filtrarLista(ArrayList<Prestamo> listaOriginal, String tipoFiltro, double saldoFiltro) {
-	    ArrayList<Prestamo> listaFiltrada = new ArrayList<>();
+		ArrayList<Prestamo> listaFiltrada = new ArrayList<>();
 
-	    if (saldoFiltro == 0.0) {
-	        return listaOriginal; // No aplicar ningún filtro y devolver la lista completa
-	    }
+		if (saldoFiltro == 0.0) {
+			return listaOriginal; // No aplicar ningún filtro y devolver la lista completa
+		}
 
-	    for (Prestamo prestamo : listaOriginal) {
-	        boolean cumpleCondición = false;
-	        double saldo = prestamo.getImportePedido();
+		for (Prestamo prestamo : listaOriginal) {
+			boolean cumpleCondición = false;
+			double saldo = prestamo.getImportePedido();
 
-	        if (tipoFiltro.equals("mayor")) {
-	            cumpleCondición = (saldo > saldoFiltro);
-	        } else if (tipoFiltro.equals("menor")) {
-	            cumpleCondición = (saldo < saldoFiltro);
-	        } else if (tipoFiltro.equals("igual")) {
-	            cumpleCondición = (saldo == saldoFiltro);
-	        }
+			if (tipoFiltro.equals("mayor")) {
+				cumpleCondición = (saldo > saldoFiltro);
+			} else if (tipoFiltro.equals("menor")) {
+				cumpleCondición = (saldo < saldoFiltro);
+			} else if (tipoFiltro.equals("igual")) {
+				cumpleCondición = (saldo == saldoFiltro);
+			}
 
-	        if (cumpleCondición) {
-	            listaFiltrada.add(prestamo);
-	        }
-	    }
+			if (cumpleCondición) {
+				listaFiltrada.add(prestamo);
+			}
+		}
 
-	    return listaFiltrada;
+		return listaFiltrada;
+	}
+
+	@Override
+	public boolean RechazarPrestamosPorIdClienteEliminado(int idCliente) {
+		return dao.RechazarPrestamosPorIdClienteEliminado(idCliente) == 0 ? false : true;
 	}
 
 	@Override
 	public float PorcentajePrestamosPorCantDeCuotas(int cuotas, int estado) {
-		
+
 		return dao.PorcentajePrestamosPorCantDeCuotas(cuotas, estado);
 	}
 }

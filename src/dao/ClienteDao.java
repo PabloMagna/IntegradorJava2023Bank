@@ -30,7 +30,7 @@ public class ClienteDao implements IClienteDao {
                 "FROM CLIENTE c " +
                 "JOIN LOCALIDADES l ON c.idLocalidad = l.ID " +
                 "JOIN PROVINCIAS p ON c.idProvincia = p.ID " +
-                "WHERE c.usuario = ? AND c.contraseña = ?";
+                "WHERE c.usuario = ? AND c.contraseña = ? AND c.Activo = 1";
         try (PreparedStatement statement = conexion.prepareStatement(consulta)) {
             statement.setString(1, usuario);
             statement.setString(2, contrasena);

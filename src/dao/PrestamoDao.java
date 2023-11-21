@@ -446,4 +446,23 @@ public class PrestamoDao implements IPrestamoDao {
 		float porcentaje = ((float) prestamosPorCantCuotas / totalPrestamos) * 100;
 		return porcentaje;
 	}
+	
+	@Override
+	public int RechazarPrestamosPorIdClienteEliminado(int idCliente) {
+	    int rechazados = 0;
+
+	    try (PreparedStatement statement = conexion.prepareStatement(
+	            "UPDATE prestamo SET estado = ? WHERE numeroCuenta IN (SELECT numero FROM cuenta WHERE idCliente = ?)")) {
+	        statement.setInt(1, Estado.RECHAZADO.ordinal()); // Estado "RECHAZADO"
+	        statement.setInt(2, idCliente);
+
+	        rechazados = statement.executeUpdate();
+	    } catch (SQLException e) {
+	        System.err.println("Error al rechazar préstamos por ID de cliente eliminado: " + e.getMessage());
+	    }
+
+	    return rechazados;
+	}
+
+
 }

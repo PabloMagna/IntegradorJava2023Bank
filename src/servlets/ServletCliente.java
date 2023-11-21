@@ -18,7 +18,9 @@ import entidad.Localidad;
 import entidad.Provincia;
 import entidad.Telefono;
 import negocio.ClienteNegocio;
+import negocio.CuentaNegocio;
 import negocio.LocalidadNegocio;
+import negocio.PrestamoNegocio;
 import negocio.ProvinciaNegocio;
 import negocio.TelefonoNegocio;
 
@@ -172,11 +174,18 @@ public class ServletCliente extends HttpServlet {
 		if (filasEliminadas) {
 			request.setAttribute("exitoEliminacionCliente", true);
 			CargarListaClientes(request, response);
+			
+			//Eliminar sus cuentas y rechaza préstamos.
+			CuentaNegocio cuentaNegocio = new CuentaNegocio();
+			cuentaNegocio.EliminarCuentasPorIdCliente(clienteId);
+			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
+			prestamoNegocio.RechazarPrestamosPorIdClienteEliminado(clienteId);
+			
 
 			RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoClientes.jsp");
 			dispatcher.forward(request, response);
 		} else {
-			response.sendRedirect("Error.jsp");
+			response.sendRedirect("ErrorPermiso.jsp");
 		}
 	}
 	

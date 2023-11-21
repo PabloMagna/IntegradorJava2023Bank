@@ -13,4 +13,5 @@ public interface IPrestamoNegocio {
 	public Prestamo ObtenerPrestamoPorId(int idPrestamo);
 	public ArrayList<Prestamo> ListarPorClienteAprobados(int idCliente);
 	public float PorcentajePrestamosPorCantDeCuotas(int cuotas, int estado);
+	public boolean RechazarPrestamosPorIdClienteEliminado(int idCliente);
 }

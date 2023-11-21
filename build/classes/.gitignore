@@ -1,7 +1,5 @@
 /dao/
-/entidad/
-/excepciones/
 /interfazDao/
-/interfazNegocio/
 /negocio/
+/interfazNegocio/
 /servlets/

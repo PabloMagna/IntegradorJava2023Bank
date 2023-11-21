@@ -65,6 +65,11 @@ public class CuentaNegocio implements ICuentaNegocio {
 		return dao.SumarSaldo(numeroCuenta,saldo)==0?false:true;
 	}
 	
+	@Override
+	public boolean EliminarCuentasPorIdCliente(int idCliente){
+		return dao.EliminarCuentasPorIdCliente(idCliente) == 0?false : true;
+	}
+	
 	
 	
 	//METODOS

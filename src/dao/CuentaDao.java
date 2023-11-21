@@ -509,4 +509,19 @@ public class CuentaDao implements ICuentaDao {
 
 		return cantidadCuentas;
 	}
+	
+	@Override
+	public int EliminarCuentasPorIdCliente(int idCliente) {
+	    int resultado = 0;
+
+	    try (PreparedStatement statement = conexion.prepareStatement("UPDATE cuenta SET activo = 0 WHERE idCliente = ?")) {
+	        statement.setInt(1, idCliente);
+	        resultado = statement.executeUpdate();
+	    } catch (SQLException e) {
+	        System.err.println("Error al realizar la baja lógica de las cuentas del cliente: " + e.getMessage());
+	    }
+
+	    return resultado;
+	}
+
 }
