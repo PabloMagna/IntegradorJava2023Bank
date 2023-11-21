@@ -36,6 +36,7 @@
     function confirmarEliminacion(idCuenta) {
         Swal.fire({
             title: '¿Seguro que deseas eliminar esta cuenta?',
+            html: 'Se rechazarán los préstamos pendientes asociados.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',

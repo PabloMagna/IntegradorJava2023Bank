@@ -104,7 +104,7 @@
 			<div class="mb-3">
 				<label for="saldo" class="form-label">Saldo:</label> <input
 					type="text" name="saldo" value="<%=saldoFormateado%>" id="saldo"
-					maxlength="11" class="form-control" required>
+					maxlength="8" class="form-control" required>
 			</div>
 			<button type="submit" class="btn btn-success" name="btnModificar">Modificar
 				Cuenta</button>

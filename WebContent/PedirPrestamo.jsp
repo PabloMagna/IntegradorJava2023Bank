@@ -65,7 +65,7 @@
 				<label for="importe">Importe:</label> <input type="text"
 					name="importe" id="importe" class="form-control" required
 					pattern="^\d{1,8}(\.\d{1,2})?$"
-					placeholder="ingresá numero ( hasta 8 enteros y 2 decimales)">
+					placeholder="ingresá numero ( hasta 6 enteros y 2 decimales)" >
 			</div>
 
 			<div class="form-group">

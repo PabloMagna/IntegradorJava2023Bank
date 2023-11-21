@@ -32,20 +32,20 @@
 </script>
 
 <script>
-		function confirmarEliminacionCliente(idCliente) {
-				Swal.fire({
-		            title: '¿Seguro que deseas eliminar a este cliente?',
-		            icon: 'warning',
-		            showCancelButton: true,
-		            confirmButtonText: 'Sí, eliminar',
-		            cancelButtonText: 'Cancelar'
-		        }).then((result) => {
-		            if (result.isConfirmed) {
-		                window.location.href = "ServletCliente?ElimId=" + idCliente;
-		            }
-		        });
-			} 
-		//}
+function confirmarEliminacionCliente(idCliente) {
+    Swal.fire({
+        title: '¿Seguro que deseas eliminar a este cliente?',
+        icon: 'warning',
+        html: 'Se eliminarán las cuentas asociadas y los préstamos serán rechazados.',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "ServletCliente?ElimId=" + idCliente;
+        }
+    });
+}
 	</script>
 
 <script type="text/javascript">

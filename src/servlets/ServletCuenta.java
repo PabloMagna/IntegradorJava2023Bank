@@ -20,6 +20,7 @@ import entidad.TipoMovimiento;
 import negocio.ClienteNegocio;
 import negocio.CuentaNegocio;
 import negocio.MovimientoNegocio;
+import negocio.PrestamoNegocio;
 
 @WebServlet("/ServletCuenta")
 public class ServletCuenta extends HttpServlet {
@@ -187,6 +188,12 @@ public class ServletCuenta extends HttpServlet {
 
 		if (exitoEliminacion) {
 			request.setAttribute("exitoEliminacion", true);
+			
+			//Se rechazan los prestamos pendientes pedidos.
+			PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
+			prestamoNegocio.RechazarPrestamoPorBajaCuenta(numeroCuentaAEliminar);
+			
+			
 		} else {
 			request.setAttribute("exitoEliminacion", false);
 		}

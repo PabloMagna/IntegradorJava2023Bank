@@ -41,6 +41,11 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 	public ArrayList<Prestamo> ListarPorClienteAprobados(int idCliente) {
 		return dao.ListarPorClienteAprobados(idCliente);
 	}
+	
+	@Override
+	public boolean RechazarPrestamoPorBajaCuenta(int numeroCuenta) {
+		return dao.RechazarPrestamoPorBajaCuenta(numeroCuenta) == 0 ? false : true;
+	}
 
 	public ArrayList<Prestamo> filtrarLista(ArrayList<Prestamo> listaOriginal, String tipoFiltro, double saldoFiltro) {
 		ArrayList<Prestamo> listaFiltrada = new ArrayList<>();

@@ -166,12 +166,12 @@ public class ClienteDao implements IClienteDao {
         		"FROM CLIENTE c\r\n" + 
         		"JOIN LOCALIDADES l ON c.idLocalidad = l.ID\r\n" + 
         		"JOIN PROVINCIAS p ON c.idProvincia = p.ID\r\n" + 
-        		"WHERE c.activo = 1 AND c.idTipo = 0"; // Agregar la condición para el tipo igual a 0 (no admin)
-
+        		"WHERE c.activo = 1 AND c.idTipo = 0"; 
         if (busqueda != null && !busqueda.isEmpty()) {
             // Agregar el filtro con LIKE a la consulta
             consultaClientes += " AND (c.usuario LIKE ? OR c.nombre LIKE ? OR c.apellido LIKE ? " +
-                "OR c.nacionalidad LIKE ? OR c.direccion LIKE ? OR c.correo LIKE ?)";
+                "OR c.nacionalidad LIKE ? OR c.direccion LIKE ? OR c.correo LIKE ? " +
+                "OR CAST(c.dni AS CHAR) LIKE ? OR c.cuil LIKE ?)";
         }
 
         try (PreparedStatement statement = conexion.prepareStatement(consultaClientes)) {
@@ -184,6 +184,8 @@ public class ClienteDao implements IClienteDao {
                 statement.setString(4, busquedaParam);
                 statement.setString(5, busquedaParam);
                 statement.setString(6, busquedaParam);
+                statement.setString(7, busquedaParam); // Parámetro para DNI
+                statement.setString(8, busquedaParam); // Parámetro para CUIL
             }
 
             try (ResultSet resultSet = statement.executeQuery()) {

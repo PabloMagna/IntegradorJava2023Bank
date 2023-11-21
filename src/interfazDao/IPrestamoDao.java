@@ -13,4 +13,5 @@ public interface IPrestamoDao {
 	public Prestamo ObtenerPrestamoPorId(int idPrestamo);
 	public float PorcentajePrestamosPorCantDeCuotas(int cuotas, int estado);
 	public int RechazarPrestamosPorIdClienteEliminado(int idCliente);
+	public int RechazarPrestamoPorBajaCuenta(int numeroCuenta);
 }

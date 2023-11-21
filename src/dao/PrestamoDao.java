@@ -463,6 +463,24 @@ public class PrestamoDao implements IPrestamoDao {
 
 	    return rechazados;
 	}
+	
+	@Override
+	public int RechazarPrestamoPorBajaCuenta(int numeroCuenta) {
+	    int rechazados = 0;
+
+	    try (PreparedStatement statement = conexion.prepareStatement(
+	            "UPDATE prestamo SET estado = ? WHERE numeroCuenta = ? AND estado = ?")) {
+	        statement.setInt(1, Estado.RECHAZADO.ordinal()); // Estado "RECHAZADO"
+	        statement.setInt(2, numeroCuenta);
+	        statement.setInt(3, Estado.PENDIENTE.ordinal()); // Estado "PENDIENTE"
+
+	        rechazados = statement.executeUpdate();
+	    } catch (SQLException e) {
+	        System.err.println("Error al rechazar préstamos por baja de cuenta: " + e.getMessage());
+	    }
+
+	    return rechazados;
+	}
 
 
 }

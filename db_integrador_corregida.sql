@@ -2750,3 +2750,4 @@ INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES
 INSERT INTO cuenta (idCliente, CBU, saldo, fecha, activo, idTipoCuenta) VALUES 
 (17, '3636363636363636363636', 10000.00, '2021-01-20', 1, 1),
 (17, '3737373737373737373737', 10000.00, '2022-03-11', 1, 1);
+
