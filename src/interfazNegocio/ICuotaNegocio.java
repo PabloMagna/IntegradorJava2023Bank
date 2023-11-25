@@ -11,4 +11,5 @@ public interface ICuotaNegocio {
 	public Cuota obtenerCuotaPorNumeroYID(int idCuota);
 	public ArrayList<Cuota> ListarPorIdPrestamo(int idPrestamo);
 	public ArrayList<Cuota> ListarPorClienteAprobadoEImpago(int idCliente);
+	public ArrayList<Cuota> ListarCuotasPagadasPorPrestamo(int idPrestamo);
 }

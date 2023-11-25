@@ -96,6 +96,7 @@
 				<th>Importe</th>
 				<th>Seleccionar Cuenta</th>
 				<th>Pagar</th>
+				<th>Historial</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -134,8 +135,8 @@
 					</select></td>
 
 					<td><input id="importe" name="importe"
-						value=<%=cuotasDelPrestamo.get(0).getImporte()%> class="border-0" readonly>
-					</td>
+						value=<%=cuotasDelPrestamo.get(0).getImporte()%> class="border-0"
+						readonly></td>
 					<td><select name="cuenta" class="form-select">
 							<%
 								for (Cuenta cuenta : listaCuentas) {
@@ -150,6 +151,10 @@
 							value="<%=idPrestamo%>">
 							<i class="bi bi-cash"></i> Pagar
 						</button>
+					</td>
+					<td>
+						<a href="ServletPrestamo?cuotasPagas=<%=idPrestamo%>" class="btn btn-secondary"> 
+						<i class="bi bi-exclamation-triangle"></i> Historial</a>
 					</td>
 				</form>
 			</tr>

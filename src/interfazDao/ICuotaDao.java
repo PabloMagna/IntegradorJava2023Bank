@@ -11,4 +11,5 @@ public interface ICuotaDao {
 	public Cuota obtenerCuotaPorNumeroYID(int idCouta);
 	public ArrayList<Cuota> ListarPorIdPrestamo(int idPrestamo);
 	public ArrayList<Cuota> ListarPorClienteAprobadoEImpago(int idCliente);
+	public ArrayList<Cuota> ListarCuotasPagadasPorPrestamo(int idPrestamo);
 }

@@ -34,5 +34,10 @@ public class CuotaNegocio implements ICuotaNegocio {
 	public ArrayList<Cuota> ListarPorClienteAprobadoEImpago(int idCliente) {
 		return dao.ListarPorClienteAprobadoEImpago(idCliente);
 	}
+	
+	@Override
+	public ArrayList<Cuota> ListarCuotasPagadasPorPrestamo(int idPrestamo){
+		return dao.ListarCuotasPagadasPorPrestamo(idPrestamo);
+	}
 
 }

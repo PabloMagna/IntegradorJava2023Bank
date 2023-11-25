@@ -71,6 +71,9 @@ public class ServletPrestamo extends HttpServlet {
 		// FILTRAR REPORTE 2 (ReporteEstadisticoCantCuotas.jsp)
 		if (request.getParameter("btnFiltrarReporte2") != null) 
 			FiltrarReporte2(request, response);
+		
+		if(request.getParameter("cuotasPagas")!= null)
+			ListarCuotasPagasPorPrestamo(request,response);
 
 	}
 
@@ -344,6 +347,19 @@ public class ServletPrestamo extends HttpServlet {
 		ArrayList<Cuenta> listaCuentas = cuentaNegocio.ListarPorIdCliente(idCliente, null);
 
 		request.setAttribute("listaCuentas", listaCuentas);
+	}
+	
+	private void ListarCuotasPagasPorPrestamo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		int idPrestamo = Integer.parseInt(request.getParameter("cuotasPagas"));
+		
+		CuotaNegocio cuotaNegocio = new CuotaNegocio();
+			
+		ArrayList<Cuota> listaCuotas = cuotaNegocio.ListarCuotasPagadasPorPrestamo(idPrestamo);
+		
+		request.setAttribute("listaCuotas", listaCuotas);
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("ListadoCuotasPagadas.jsp");
+		dispatcher.forward(request, response);
 	}
 
 }
