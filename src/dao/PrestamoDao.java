@@ -119,8 +119,7 @@ public class PrestamoDao implements IPrestamoDao {
 				+ "FROM prestamo p " + "JOIN cuenta c ON p.numeroCuenta = c.numero "
 				+ "JOIN cliente cl ON c.idCliente = cl.idCliente "
 				+ "JOIN tiposcuenta tc ON c.idTipoCuenta = tc.idTipoCuenta "
-				+ "JOIN provincias pr ON cl.idProvincia = pr.id " + "JOIN localidades l ON cl.idLocalidad = l.id "
-				+ "WHERE p.estado = 0";
+				+ "JOIN provincias pr ON cl.idProvincia = pr.id " + "JOIN localidades l ON cl.idLocalidad = l.id ";
 
 		// Verifica si se proporciona una cadena de búsqueda
 		if (busqueda != null) {
@@ -160,7 +159,7 @@ public class PrestamoDao implements IPrestamoDao {
 					prestamo.setImportePorMes(resultSet.getDouble("importexmes"));
 					prestamo.setCuotas(resultSet.getInt("cuotas"));
 					prestamo.setFechaPedido(resultSet.getDate("fechaPedido").toLocalDate());
-					prestamo.setEstado(Estado.PENDIENTE);
+					prestamo.setEstado(resultSet.getInt("p.estado"));
 
 					// Cliente
 					cliente.setIdCliente(resultSet.getInt("idCliente"));
@@ -189,6 +188,8 @@ public class PrestamoDao implements IPrestamoDao {
 
 					cuenta.setCliente(cliente);
 					prestamo.setCuenta(cuenta);
+					
+					 System.out.println(prestamo.toString());
 
 					prestamosPendientes.add(prestamo);
 				}
@@ -287,13 +288,7 @@ public class PrestamoDao implements IPrestamoDao {
 					prestamo.setFechaPedido(resultSet.getDate("fechaPedido").toLocalDate());
 
 					int estadoNumerico = resultSet.getInt("estado");
-					Estado estadoPrestamo = Estado.PENDIENTE;
-					if (estadoNumerico == 1) {
-						estadoPrestamo = Estado.APROBADO;
-					} else if (estadoNumerico == 2) {
-						estadoPrestamo = Estado.RECHAZADO;
-					}
-					prestamo.setEstado(estadoPrestamo);
+					prestamo.setEstado(estadoNumerico);
 
 					// Cliente
 					cliente.setIdCliente(resultSet.getInt("idCliente"));

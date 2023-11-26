@@ -41,17 +41,18 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 	public ArrayList<Prestamo> ListarPorClienteAprobados(int idCliente) {
 		return dao.ListarPorClienteAprobados(idCliente);
 	}
-	
+
 	@Override
 	public boolean RechazarPrestamoPorBajaCuenta(int numeroCuenta) {
 		return dao.RechazarPrestamoPorBajaCuenta(numeroCuenta) == 0 ? false : true;
 	}
 
-	public ArrayList<Prestamo> filtrarLista(ArrayList<Prestamo> listaOriginal, String tipoFiltro, double saldoFiltro) {
+	public ArrayList<Prestamo> filtrarLista(ArrayList<Prestamo> listaOriginal, String tipoFiltro, double saldoFiltro,
+			int estadoFiltro) {
 		ArrayList<Prestamo> listaFiltrada = new ArrayList<>();
 
 		if (saldoFiltro == 0.0) {
-			return listaOriginal; // No aplicar ningún filtro y devolver la lista completa
+			return	listaFiltroEstado(listaOriginal, estadoFiltro);		
 		}
 
 		for (Prestamo prestamo : listaOriginal) {
@@ -71,8 +72,23 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 			}
 		}
 
-		return listaFiltrada;
+		return listaFiltroEstado(listaFiltrada, estadoFiltro);
 	}
+	private ArrayList<Prestamo> listaFiltroEstado(ArrayList<Prestamo> listaOriginal, int estadoFiltro) {
+		ArrayList<Prestamo> listaTocada = new ArrayList<Prestamo>();
+		
+		if (listaOriginal == null) 
+			return null;
+		if(estadoFiltro == 3)
+			return listaOriginal;
+		for (Prestamo prestamo : listaOriginal) {
+			if(prestamo.getEstado().ordinal() == estadoFiltro) {
+				listaTocada.add(prestamo);
+			}
+		}
+		return listaTocada;
+	}
+
 
 	@Override
 	public boolean RechazarPrestamosPorIdClienteEliminado(int idCliente) {
@@ -84,4 +100,5 @@ public class PrestamoNegocio implements IPrestamoNegocio {
 
 		return dao.PorcentajePrestamosPorCantDeCuotas(cuotas, estado);
 	}
+
 }

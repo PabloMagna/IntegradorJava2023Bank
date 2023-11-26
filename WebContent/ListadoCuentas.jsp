@@ -191,13 +191,13 @@
 					<button class="btn btn-danger" data-toggle="tooltip"
 						data-placement="top" title="Eliminar"
 						onclick="confirmarEliminacion(<%=cuenta.getNumero()%>);">
-						<i class="bi bi-trash"></i> Eliminar
+						<i class="bi bi-trash"></i>
 					</button>
 				</td>
 				<td><a
 					href="ServletCuenta?ModificarNumero=<%=cuenta.getNumero()%>"
 					class="btn btn-primary" data-toggle="tooltip" data-placement="top"
-					title="Modificar"> <i class="bi bi-pencil"></i> Modificar
+					title="Modificar"> <i class="bi bi-pencil"></i>
 				</a></td>
 			</tr>
 

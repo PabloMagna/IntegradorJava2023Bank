@@ -124,6 +124,7 @@ public class ServletPrestamo extends HttpServlet {
 		ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes(null);
 
 		request.setAttribute("listaPrestamo", listaPrestamos);
+		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
 		dispatcher.forward(request, response);
 	}
@@ -145,20 +146,24 @@ public class ServletPrestamo extends HttpServlet {
 	private void FiltrarPrestamosAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String tipoFiltro = request.getParameter("operadorSaldo");
 		String saldoFiltroStr = request.getParameter("saldoFiltro");
+		String estadoFiltroStr = request.getParameter("estadoFiltro");
 		double saldoFiltro = (saldoFiltroStr != null && !saldoFiltroStr.isEmpty())
 				? Double.parseDouble(saldoFiltroStr)
 				: 0.0;
+		int estadoFiltro = Integer.parseInt(estadoFiltroStr);
 		String busqueda = request.getParameter("busqueda");
 
 		PrestamoNegocio prestamoNegocio = new PrestamoNegocio();
 		ArrayList<Prestamo> listaPrestamos = prestamoNegocio.ListarPendientes(busqueda);
-		listaPrestamos = prestamoNegocio.filtrarLista(listaPrestamos, tipoFiltro, saldoFiltro);
+		listaPrestamos = prestamoNegocio.filtrarLista(listaPrestamos, tipoFiltro, saldoFiltro, estadoFiltro);
 
 		request.setAttribute("listaPrestamo", listaPrestamos);
 
 		request.setAttribute("operadorSaldo", tipoFiltro);
 		request.setAttribute("busqueda", busqueda);
 		request.setAttribute("saldoFiltro", saldoFiltro);
+		request.setAttribute("estadoFiltro", estadoFiltro);
+		
 
 		RequestDispatcher dispatcher = request.getRequestDispatcher("ListarPrestamosAdmin.jsp");
 		dispatcher.forward(request, response);

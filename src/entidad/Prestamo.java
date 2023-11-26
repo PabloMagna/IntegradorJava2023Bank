@@ -85,17 +85,42 @@ public class Prestamo {
 		this.estado = estado;
 	}	
 	public void setEstado(int estado) {
-		if(estado == 0)
-			this.estado = Estado.PENDIENTE;
-		else if(estado == 1)
-			this.estado = Estado.APROBADO;
-		else
-			this.estado = Estado.RECHAZADO;
+	    switch (estado) {
+	        case 0:
+	            this.estado = Estado.PENDIENTE;
+	            break;
+	        case 1:
+	            this.estado = Estado.APROBADO;
+	            break;
+	        case 2:
+	            this.estado = Estado.RECHAZADO;
+	            break;
+	    }
 	}
+
 	public Estado getEstado() {
 		return this.estado;
 	}
 	
+	public String getEstadoAsString() {
+        switch (this.estado) {
+            case PENDIENTE:
+                return "Pendiente";
+            case APROBADO:
+                return "Aprobado";
+            case RECHAZADO:
+                return "Rechazado";
+            default:
+                return "Desconocido";
+        }
+    }
+
+	@Override
+	public String toString() {
+		return "Prestamo [idPrestamo=" + idPrestamo + ", cuenta=" + cuenta + ", importePedido=" + importePedido
+				+ ", importePorMes=" + importePorMes + ", cuotas=" + cuotas + ", fechaPedido=" + fechaPedido
+				+ ", estado=" + estado + "]";
+	}
 	
 	
 }

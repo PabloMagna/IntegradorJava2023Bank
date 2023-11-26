@@ -95,7 +95,7 @@
 				<label for="busqueda" class="form-label">Buscar:</label>
 				<div class="input-group">
 					<input type="text" id="busqueda" name="busqueda"
-						class="form-control"
+						class="form-control" placeholder="Ingrese búsqueda"
 						value="<%=(request.getParameter("busqueda") != null) ? request.getParameter("busqueda") : ""%>">
 					<button type="submit" name="btnBusquedaAdmin"
 						class="btn btn-primary">Buscar</button>
@@ -118,9 +118,27 @@
 					&& request.getParameter("operadorSaldo").equals("igual")) ? "selected" : ""%>>Igual
 							a:</option>
 					</select> <input type="text" id="saldoFiltro" name="saldoFiltro"
-						class="form-control"
+						class="form-control  me-2" placeholder="Importe"
 						value="<%=(request.getParameter("saldoFiltro") != null) ? request.getParameter("saldoFiltro") : ""%>"
 						oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+					<select name="estadoFiltro" class="form-select">
+						<option value="3"
+							<%=(request.getParameter("estadoFiltro") != null && request.getParameter("estadoFiltro").equals("3"))
+					? "selected"
+					: ""%>>TODOS</option>
+						<option value="0"
+							<%=(request.getParameter("estadoFiltro") != null && request.getParameter("estadoFiltro").equals("0"))
+					? "selected"
+					: ""%>>PENDIENTE</option>
+						<option value="1"
+							<%=(request.getParameter("estadoFiltro") != null && request.getParameter("estadoFiltro").equals("1"))
+					? "selected"
+					: ""%>>ACEPTADO</option>
+						<option value="2"
+							<%=(request.getParameter("estadoFiltro") != null && request.getParameter("estadoFiltro").equals("2"))
+					? "selected"
+					: ""%>>RECHAZADO</option>
+					</select>
 					<button type="submit" name="btnFiltrarAdmin"
 						class="btn btn-success">Filtrar</button>
 					<button type="button" onclick="limpiarCampos()"
@@ -129,6 +147,7 @@
 			</div>
 		</form>
 	</div>
+
 
 	<%
 		ArrayList<Prestamo> listaPrestamos = (ArrayList<Prestamo>) request.getAttribute("listaPrestamo");
@@ -162,6 +181,9 @@
 				<td><%=prestamo.getFechaPedido()%></td>
 				<td><%=prestamo.getEstado()%></td>
 				<td>
+					<%
+						if (prestamo.getEstado().ordinal() == 0) {
+					%>
 					<form action="ServletPrestamo" method="post">
 						<input type="hidden" name="idPrestamo"
 							value="<%=prestamo.getIdPrestamo()%>">
@@ -175,8 +197,14 @@
 							data-toggle="tooltip" data-placement="top" title="Rechazar">
 							<i class="bi bi-x-circle"></i>
 						</button>
-					</form>
+					</form> <%
+ 	} else {
+ %> <!-- Muestra un guión si el estado no es PENDIENTE (ordinal 0) -->
+					- <%
+ 	}
+ %>
 				</td>
+
 			</tr>
 			<%
 				}
@@ -211,7 +239,8 @@
 						});
 	</script>
 	<div class="text-center">
-  <a class="btn btn-primary mx-auto" href="Inicio.jsp">Volver al Inicio</a>
-</div>
+		<a class="btn btn-primary mx-auto" href="Inicio.jsp">Volver al
+			Inicio</a>
+	</div>
 </body>
 </html>
